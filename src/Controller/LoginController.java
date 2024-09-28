@@ -5,6 +5,9 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
+
+
+import View.HomeScene;
 import View.SignUpScene;
 
 public class LoginController {
@@ -14,7 +17,6 @@ public class LoginController {
 	
 	@FXML
 	private TextField passwordTextField;
-	
 	
 	
 //	@FXML
@@ -40,9 +42,14 @@ public class LoginController {
 	
 	@FXML
 	public void loginButton(ActionEvent e) {
-		
-		System.out.println("It is Work");
+	    Button source = (Button) e.getSource();
+	    Stage primaryStage = (Stage) source.getScene().getWindow();            
+
+	    HomeScene homeScene = new HomeScene(source.getScene());
+	    primaryStage.setTitle(homeScene.getTitle());
+	    primaryStage.setScene(homeScene.getScene());
 	}
+
 	
 	
 

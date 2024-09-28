@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Tab?>
+<?import javafx.scene.control.TabPane?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.text.Text?>
+
+<TabPane fx:id="tabPane" prefHeight="600" prefWidth="800" tabClosingPolicy="UNAVAILABLE" xmlns="http://javafx.com/javafx/22" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Controller.HomeSceneController">
+    <tabs>
+
+        <!-- Home Tab -->
+        <Tab fx:id="homeTab" text="HOME">
+            <content>
+                <GridPane alignment="CENTER" hgap="10" prefHeight="600.0" prefWidth="800.0" style="-fx-padding: 30;" vgap="10">
+                    <!-- Column Constraints -->
+                    <columnConstraints>
+                        <ColumnConstraints hgrow="ALWAYS" />
+                    </columnConstraints>
+
+                    <!-- Row Constraints -->
+                    <rowConstraints>
+                        <RowConstraints minHeight="50.0" vgrow="SOMETIMES" />
+                        <RowConstraints minHeight="50.0" vgrow="SOMETIMES" />
+                        <RowConstraints minHeight="50.0" vgrow="SOMETIMES" />
+                        <RowConstraints minHeight="50.0" vgrow="SOMETIMES" />
+                  <RowConstraints />
+                    </rowConstraints>
+
+                    <children>
+                        <!-- Welcome Text, centered -->
+                        <Text fill="#117bd6" style="-fx-font-size: 24px; -fx-font-weight: bold;" text="Welcome to Reading Room Book Store" GridPane.halignment="CENTER" GridPane.rowIndex="0" />
+
+                        <!-- Username Label, centered -->
+                        <Label fx:id="userNameLabel" style="-fx-font-size: 18px; -fx-text-fill: #333;" text="User Name" GridPane.halignment="CENTER" GridPane.rowIndex="1" />
+
+                        <!-- Top 5 Popular Books Table -->
+                        <Label style="-fx-font-size: 18px; -fx-font-weight: bold;" text="Top 5 Popular Books" GridPane.halignment="CENTER" GridPane.rowIndex="2" />
+
+                        <!-- Table for Top Books -->
+                        <TableView fx:id="topBooksTable" prefHeight="300.0" prefWidth="700.0" GridPane.halignment="CENTER" GridPane.rowIndex="3">
+                            <columns>
+                                <TableColumn prefWidth="261.9999752044678" text="BOOK TITLE" />
+                                <TableColumn prefWidth="124.79998779296875" text="AUTHORS" />
+                                <TableColumn prefWidth="132.39999389648438" text="PHYSICAL COPIES" />
+                                <TableColumn prefWidth="112.79998779296875" text="PRICE (AUD)" />
+                                <TableColumn prefWidth="107.60003662109375" text="SOLD COPIES" />
+                            </columns>
+                        </TableView>
+
+                        <!-- Add to Cart Button -->
+                        <Button fx:id="addToCartButton" style="-fx-background-color: #117bd6; -fx-text-fill: white;" text="Add to Cart" GridPane.halignment="CENTER" GridPane.rowIndex="4" />
+                    </children>
+                </GridPane>
+            </content>
+        </Tab>
+
+        <!-- Shopping Cart Tab (Adjusted with GridPane Only) -->
+        <Tab fx:id="cartTab" text="Cart">
+            <content>
+                <GridPane alignment="CENTER" hgap="10" prefHeight="600.0" prefWidth="800.0" style="-fx-padding: 30;" vgap="10">
+                    <!-- Column Constraints -->
+                    <columnConstraints>
+                        <ColumnConstraints hgrow="ALWAYS" />
+                    </columnConstraints>
+
+                    <!-- Row Constraints -->
+                    <rowConstraints>
+                        <RowConstraints minHeight="50.0" vgrow="SOMETIMES" />
+                        <RowConstraints minHeight="50.0" vgrow="SOMETIMES" />
+                        <RowConstraints minHeight="50.0" vgrow="SOMETIMES" />
+                        <RowConstraints minHeight="50.0" vgrow="SOMETIMES" />
+                  <RowConstraints />
+                    </rowConstraints>
+
+                    <children>
+                        <!-- Title Text for Cart Tab, centered -->
+                        <Text fill="#117bd6" style="-fx-font-size: 24px; -fx-font-weight: bold;" text="Shopping Cart" GridPane.halignment="CENTER" GridPane.rowIndex="0" />
+
+                        <!-- Label for Books in Cart, centered -->
+                        <Label style="-fx-font-size: 16px;" text="Books in Cart:" GridPane.halignment="CENTER" GridPane.rowIndex="1" />
+
+                        <!-- Table for Cart Items -->
+                        <TableView fx:id="cartListView" prefHeight="300.0" prefWidth="700.0" GridPane.halignment="CENTER" GridPane.rowIndex="2">
+                            <columns>
+                                <TableColumn prefWidth="200.0" text="BOOK TITLE" />
+                                <TableColumn prefWidth="150.0" text="AUTHORS" />
+                                <TableColumn prefWidth="100.0" text="QUANTITY" />
+                                <TableColumn prefWidth="100.0" text="PRICE" />
+                            </columns>
+                        </TableView>
+
+                        <!-- Cart Controls (Quantity Adjustment and Remove) -->
+                        <GridPane alignment="CENTER" hgap="10" GridPane.rowIndex="3">
+                            <columnConstraints>
+                                <ColumnConstraints hgrow="ALWAYS" />
+                        <ColumnConstraints />
+                        <ColumnConstraints />
+                        <ColumnConstraints />
+                        <ColumnConstraints />
+                        <ColumnConstraints />
+                            </columnConstraints>
+                            <children>
+                                <Label text="Selected Book:" GridPane.columnIndex="0" />
+                                <TextField fx:id="selectedBookField" editable="false" prefWidth="200" GridPane.columnIndex="1" />
+                                <Label text="Quantity:" GridPane.columnIndex="2" />
+                                <TextField fx:id="quantityField" prefWidth="50" GridPane.columnIndex="3" />
+                                <Button onAction="#updateQuantity" text="Update Quantity" GridPane.columnIndex="4" />
+                                <Button text="Remove" GridPane.columnIndex="5" />
+                            </children>
+                     <rowConstraints>
+                        <RowConstraints />
+                     </rowConstraints>
+                        </GridPane>
+
+                        <!-- Buttons for Continue Shopping and Check Out, centered -->
+                        <GridPane alignment="CENTER" hgap="10" GridPane.rowIndex="4">
+                            <columnConstraints>
+                                <ColumnConstraints hgrow="ALWAYS" />
+                        <ColumnConstraints />
+                            </columnConstraints>
+                            <children>
+                                <Button fx:id="continueShoppingButton" onAction="#continueShopping" text="Continue Shopping" GridPane.columnIndex="0" />
+                                <Button fx:id="checkOutButton" onAction="#checkOut" text="Check Out" GridPane.columnIndex="1" />
+                            </children>
+                     <rowConstraints>
+                        <RowConstraints />
+                     </rowConstraints>
+                        </GridPane>
+                    </children>
+                </GridPane>
+            </content>
+        </Tab>
+        <!-- Account Tab -->
+        <Tab fx:id="accountTab" text="Account">
+            <content>
+                <GridPane alignment="CENTER" hgap="20" prefHeight="600" prefWidth="800" style="-fx-padding: 30;" vgap="20">
+                    <!-- Set Column Constraints with Preferred Width -->
+                    <columnConstraints>
+                        <ColumnConstraints maxWidth="300" minWidth="150" />
+                        <ColumnConstraints hgrow="ALWAYS" maxWidth="500" minWidth="300" />
+                    </columnConstraints>
+
+                    <!-- Set Row Constraints for Spacing -->
+                    <rowConstraints>
+                        <RowConstraints minHeight="50.0" />
+                        <RowConstraints minHeight="50.0" />
+                        <RowConstraints minHeight="50.0" />
+                        <RowConstraints minHeight="50.0" />
+                        <RowConstraints minHeight="50.0" />
+                    </rowConstraints>
+
+                    <children>
+                        <!-- Title Text for Account Tab -->
+                        <Text fill="#117bd6" style="-fx-font-size: 24px; -fx-font-weight: bold;" text="My Account" textAlignment="CENTER" GridPane.columnSpan="2" GridPane.halignment="CENTER" />
+
+                        <!-- First Name Label and TextField -->
+                        <Label style="-fx-font-size: 16px;" text="First Name:" GridPane.rowIndex="1" />
+                        <TextField fx:id="firstNameField" promptText="Update first name" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+
+                        <!-- Last Name Label and TextField -->
+                        <Label style="-fx-font-size: 16px;" text="Last Name:" GridPane.rowIndex="2" />
+                        <TextField fx:id="lastNameField" promptText="Update last name" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+
+                        <!-- Update Details Button -->
+                        <Button fx:id="updateDetailsButton" onAction="#updateDetails" text="Update My Details" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="3" />
+
+                        <!-- Log Out Button -->
+                        <Button fx:id="logOutButton" onAction="#logOut" text="Log Out" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="4" />
+                    </children>
+                </GridPane>
+            </content>
+        </Tab>
+
+    </tabs>
+</TabPane>

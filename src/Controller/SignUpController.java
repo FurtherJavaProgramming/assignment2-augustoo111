@@ -23,10 +23,10 @@ public class SignUpController {
 	    @FXML
 	    private TextField confirmPasswordField;
 
-		private Scene firstScene;
+		private Scene loginScene;
 		
-		public void setLoginScene(Scene firstScene) {
-			this.firstScene = firstScene;
+		public void setLoginScene(Scene loginScene) {
+			this.loginScene = loginScene;
 		}
 		
 		@FXML
@@ -38,7 +38,7 @@ public class SignUpController {
 			
 			// how to access both the first scene and primary stage in here?
 			// using set method, I can access the primary stage
-			primaryStage.setScene(firstScene);
+			primaryStage.setScene(loginScene);
 			
 		}
 
