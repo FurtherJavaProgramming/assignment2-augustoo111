@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.text.Text?>
+
+<GridPane alignment="CENTER" hgap="20" prefHeight="600" prefWidth="800" style="-fx-padding: 30;" vgap="20" xmlns="http://javafx.com/javafx/22" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Controller.OrderDetailController">
+   <columnConstraints>
+      <ColumnConstraints maxWidth="300" minWidth="150" />
+      <ColumnConstraints hgrow="ALWAYS" maxWidth="500" minWidth="300" />
+   </columnConstraints>
+   <rowConstraints>
+      <RowConstraints minHeight="50.0" />
+      <RowConstraints minHeight="50.0" prefHeight="30.0" />
+      <RowConstraints minHeight="50.0" />
+      <RowConstraints minHeight="50.0" />
+      <RowConstraints minHeight="50.0" />
+   </rowConstraints>
+   <children>
+      <!-- Order Confirmation Title -->
+      <Text fill="#117bd6" style="-fx-font-size: 24px; -fx-font-weight: bold;" text="Order Confirmation" textAlignment="CENTER" GridPane.columnSpan="2" GridPane.halignment="CENTER" />
+
+      <!-- Unique Order Number -->
+      <Label style="-fx-font-size: 16px;" text="Order Number:" GridPane.rowIndex="1" />
+      <TextField fx:id="orderNumberField" promptText="Unique Order Number" editable="false" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+
+      <!-- Total Item Summary -->
+      <Label style="-fx-font-size: 16px;" text="Total Item:" GridPane.rowIndex="2" />
+      <TextField fx:id="totalItemsField" editable="false" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+
+      <!-- Total Amount -->
+      <Label style="-fx-font-size: 16px;" text="Total Amount:" GridPane.rowIndex="3" />
+      <TextField fx:id="totalAmountField" editable="false" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+
+      <!-- Back to Home Button -->
+      <Button fx:id="backToHomeButton" onAction="#goBackToHome" text="Back to Home" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="4" />
+   </children>
+</GridPane>

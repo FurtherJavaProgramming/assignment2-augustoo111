@@ -1,7 +1,11 @@
 package Controller;
 
 
+
 import View.CheckOutView;
+import View.ViewOrderView;
+import View.updatePasswordView;
+import View.updateProfileView;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Scene;
@@ -33,11 +37,7 @@ public class HomeSceneController {
     @FXML
     private TextField lastNameField;
 
-    @FXML
-    private Button updateDetailsButton;
-
-    @FXML
-    private Button logOutButton;
+    
 
     @FXML
     private Button continueShoppingButton;
@@ -63,6 +63,18 @@ public class HomeSceneController {
 
     @FXML
     private Label cartLabel;
+    
+    @FXML
+    private Button updatePasswordButton;
+    @FXML
+    private Button updateDetailsButton;
+
+    @FXML
+    private Button logOutButton;
+    @FXML
+    private Button viewOrderButton;
+    
+    
 
     private Scene loginScene;
 
@@ -73,12 +85,38 @@ public class HomeSceneController {
 
 
     @FXML
-    public void updateDetails() {
-        // Handle the action of updating user details
-        String firstName = firstNameField.getText();
-        String lastName = lastNameField.getText();
-        System.out.println("Updated Details: " + firstName + " " + lastName);
+    public void updateDetails(ActionEvent e) {
+        System.out.println("Update Details clicked");
+        Button source = (Button) e.getSource();
+        Stage primaryStage = (Stage) source.getScene().getWindow();
+        
+        // Similar to CheckOutView, create an instance of updateProfileView
+        updateProfileView updateProfile = new updateProfileView(source.getScene());
+        
+        // Set the title for the stage to reflect the update details page
+        primaryStage.setTitle(updateProfile.getTitle());
+        
+        // Switch to the update details scene
+        primaryStage.setScene(updateProfile.getScene());
     }
+
+    
+    @FXML
+    public void updatePassword(ActionEvent e) {
+    	System.out.println("Update Password clicked");
+        Button source = (Button) e.getSource();
+        Stage primaryStage = (Stage) source.getScene().getWindow();
+
+        // Similar to CheckOutView, create an instance of UpdatePasswordView
+        updatePasswordView updatePWView = new updatePasswordView(source.getScene());
+        
+        // Set the title for the stage to reflect the password update page
+        primaryStage.setTitle(updatePWView.getTitle());
+        
+        // Switch to the update password scene
+        primaryStage.setScene(updatePWView.getScene());
+    }
+
 
     @FXML
     public void logOut() {
@@ -108,6 +146,14 @@ public class HomeSceneController {
 	    primaryStage.setTitle(checkoutScene.getTitle());
 	    primaryStage.setScene(checkoutScene.getScene());
 	}
+    @FXML
+	public void viewOrder(ActionEvent e) {
+	    Button source = (Button) e.getSource();
+	    Stage primaryStage = (Stage) source.getScene().getWindow();            
+	    ViewOrderView viewOrder = new ViewOrderView(source.getScene());
+	    primaryStage.setTitle(viewOrder.getTitle());
+	    primaryStage.setScene(viewOrder.getScene());
+	}
 
     @FXML
     public void updateQuantity() {
@@ -119,11 +165,16 @@ public class HomeSceneController {
         }
     }
 
-
     public void selectShoppingCartTab() {
         if (tabPane != null && cartTab != null) {
             tabPane.getSelectionModel().select(cartTab);  // Select the shopping cart tab
             System.out.println("Switched to shopping cart tab!");
+        }
+    }
+    public void selectAccountTab() {
+        if (tabPane != null && accountTab != null) {
+            tabPane.getSelectionModel().select(accountTab);  // Select the shopping cart tab
+            System.out.println("Switched to Account tab!");
         }
     }
     

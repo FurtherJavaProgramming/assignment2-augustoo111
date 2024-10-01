@@ -35,9 +35,6 @@ public class SignUpController {
 			
 			Button source = (Button) e.getSource();
 			Stage primaryStage = (Stage) source.getScene().getWindow();
-			
-			// how to access both the first scene and primary stage in here?
-			// using set method, I can access the primary stage
 			primaryStage.setScene(loginScene);
 			
 		}

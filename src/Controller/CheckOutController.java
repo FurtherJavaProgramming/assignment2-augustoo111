@@ -8,6 +8,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
 import javafx.scene.Scene;
 
@@ -56,18 +57,36 @@ public class CheckOutController {
 
     @FXML
     public void placeOrder() {
-        String nameOnCard = nameOnCardField.getText();
-        String cardNumber = cardNumberField.getText();
-        String expiryMonth = expiryMonthChoiceBox.getValue();
-        String expiryYear = expiryYearChoiceBox.getValue();
-        String securityCode = securityCodeField.getText();
+//        String nameOnCard = nameOnCardField.getText();
+//        String cardNumber = cardNumberField.getText();
+//        String expiryMonth = expiryMonthChoiceBox.getValue();
+//        String expiryYear = expiryYearChoiceBox.getValue();
+//        String securityCode = securityCodeField.getText();
+//
+//        if (validatePaymentDetails(nameOnCard, cardNumber, expiryMonth, expiryYear, securityCode)) {
+//            System.out.println("Order placed successfully!");
 
-        if (validatePaymentDetails(nameOnCard, cardNumber, expiryMonth, expiryYear, securityCode)) {
-            System.out.println("Order placed successfully!");
-        } else {
-            System.out.println("Invalid payment details, please correct and try again.");
-        }
+            // Load the Order Detail scene
+            try {
+                FXMLLoader loader = new FXMLLoader(getClass().getResource("/View/orderDetail.fxml"));
+                GridPane orderDetailPane = loader.load();  // Load the layout
+                Scene orderDetailScene = new Scene(orderDetailPane);
+
+                // Change the stage to the new scene (Order Detail)
+                Stage primaryStage = (Stage) placeOrderButton.getScene().getWindow();
+                primaryStage.setScene(orderDetailScene);
+                primaryStage.setTitle("Order Details");
+
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
+//        } else {
+//            System.out.println("Invalid payment details, please correct and try again.");
+//        }
     }
+
+        
+    
 
     @FXML
     public void goBackToCart() {
@@ -96,10 +115,11 @@ public class CheckOutController {
         System.out.println("Card added: " + cardNumberField.getText());
     }
 
-    private boolean validatePaymentDetails(String nameOnCard, String cardNumber, String expiryMonth, String expiryYear, String securityCode) {
-        if (nameOnCard.isEmpty() || cardNumber.length() != 16 || securityCode.length() != 3 ) {
-            return false;
-        }
-        return true;
-    }
+//    private boolean validatePaymentDetails(String nameOnCard, String cardNumber, String expiryMonth, String expiryYear, String securityCode) {
+//        if (nameOnCard.isEmpty() || cardNumber.length() != 16 || securityCode.length() != 3 ) {
+//            return false;
+//        }
+//        return true;
+//    }
+    
 }
