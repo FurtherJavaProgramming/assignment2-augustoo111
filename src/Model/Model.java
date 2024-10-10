@@ -1,0 +1,37 @@
+package model;
+
+import java.sql.SQLException;
+
+import Dao.UserDao;
+import Dao.UserDaoImplementation;
+
+public class Model {
+	private UserDao userDao;
+	private User currentUser;
+	private AdminUser admin;
+	
+	public Model() {
+		userDao = new UserDaoImplementation();
+	}
+	
+	public void setup() throws SQLException {
+		userDao.setup();
+	}
+	public UserDao getUserDao() {
+		return userDao;
+	}
+	public AdminUser getAdminUser() {
+		return admin;
+	}
+	public void setAdminUser(AdminUser adminUser) {
+		admin = adminUser;
+	}
+	
+	public User getCurrentUser() {
+		return this.currentUser;
+	}
+	
+	public void setCurrentUser(User user) {
+		currentUser = user;
+	}
+}

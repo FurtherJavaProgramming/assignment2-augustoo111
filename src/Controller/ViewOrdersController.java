@@ -22,7 +22,6 @@ public class ViewOrdersController {
     public void handleBackToAccount() {
         Stage primaryStage = (Stage) ordersTableView.getScene().getWindow();
         primaryStage.setScene(accountScene);
-        primaryStage.setTitle("Account");
         
     }
 
@@ -30,5 +29,11 @@ public class ViewOrdersController {
     @FXML
     public void exportOrders() {
         System.out.println("Exporting all orders...");
+    }
+    
+    @FXML
+    public void exportSelectedOrders() {
+    	System.out.println("Export Selected orders...");
+    	
     }
 }

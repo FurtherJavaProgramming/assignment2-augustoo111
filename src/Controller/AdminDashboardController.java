@@ -7,6 +7,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
+import model.Model;
 
 public class AdminDashboardController {
 
@@ -22,6 +23,20 @@ public class AdminDashboardController {
     private Button logOutButton;
 
 	private Scene loginScene;
+
+    private Model model;  // Reference to the model for interaction with DAO
+
+	private Stage stage;
+
+	private Stage parentStage;
+
+    // Constructor for passing model reference
+
+    public AdminDashboardController(Stage parentStage, Model model) {
+		this.stage = new Stage();
+		this.parentStage = parentStage;
+		this.model = model;
+	}
 
     @FXML
     public void initialize() {

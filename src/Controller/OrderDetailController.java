@@ -42,11 +42,10 @@ public class OrderDetailController {
     	Button backToHomeButton = (Button) e.getSource();
         Stage primaryStage = (Stage) backToHomeButton.getScene().getWindow();
 		primaryStage.setScene(accountScene);
-		HomeScene homeScene = new HomeScene(backToHomeButton.getScene());
+		HomeScene homeScene = new HomeScene(backToHomeButton.getScene(), primaryStage, null);
         primaryStage.setTitle(homeScene.getTitle());
         primaryStage.setScene(homeScene.getScene());
         
     	
     }
 }
-

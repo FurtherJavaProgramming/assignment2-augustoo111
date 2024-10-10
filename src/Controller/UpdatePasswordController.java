@@ -6,6 +6,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.PasswordField;
+import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 
@@ -27,10 +28,10 @@ public class UpdatePasswordController {
     private Button goBackButton;
 
     @FXML
-    private Button toggleVisibilityButton1;
+    private RadioButton toggleVisibilityButton1;
 
     @FXML
-    private Button toggleVisibilityButton2;
+    private RadioButton toggleVisibilityButton2;
 
     private boolean isNewPasswordVisible = false;
     private boolean isConfirmPasswordVisible = false;

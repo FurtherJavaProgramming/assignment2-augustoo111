@@ -92,7 +92,7 @@ public class CheckOutController {
     public void goBackToCart() {
         System.out.println("Back to cart!");
         Stage primaryStage = (Stage) goBackToCartButton.getScene().getWindow();
-        HomeScene homeScene = new HomeScene(shoppingCartScene);
+        HomeScene homeScene = new HomeScene(shoppingCartScene, primaryStage, null);
         primaryStage.setScene(shoppingCartScene);
         primaryStage.setTitle(homeScene.getTitle());
         
