@@ -7,7 +7,7 @@ package model;
 public interface ShoppingCart {
 	int getNoOfCopies();
 	void setNoOfCopies(int noOfCopies);
-	int getsoldCopies();
+	int getSoldCopies();
 	double getPrice();
 	String getDetail();
 	void setSoldCopies(int soldCopies);

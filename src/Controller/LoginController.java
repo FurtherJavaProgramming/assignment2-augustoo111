@@ -17,6 +17,9 @@ import javafx.stage.Stage;
 import model.AdminUser;
 import model.Model;
 import model.User;
+import model.Book;
+import Dao.BookDao;
+import Dao.BookDaoImplementation;
 
 public class LoginController {
 
@@ -56,25 +59,28 @@ public class LoginController {
         this.model = model;
     }
 
+
     @FXML
     public void initialize() {
         // Handle login button action
         login.setOnAction(event -> {
             if (!userName.getText().isEmpty() && !password.getText().isEmpty()) {
                 try {
-                    // Fetch the user from the database
+                    // First, try to fetch the user from the regular users table
                     User user = model.getUserDao().getUser(userName.getText(), password.getText());
-                    if (user != null) {
-                        model.setCurrentUser(user);  // Save the current user in the model
-
-                        // Check if the user is an admin or a regular user
-                        if (user instanceof AdminUser) {
+                    
+                    // If not a regular user, check the admin table
+                    if (user == null) {
+                        AdminUser adminUser = model.getUserDao().getAdminUser(userName.getText(), password.getText());
+                        if (adminUser != null) {
+                            model.setCurrentUser(adminUser);  // Save the current user in the model
                             loadAdminDashboardScene();
                         } else {
-                            loadHomeScene();
+                            showErrorMessage("Wrong username or password");
                         }
                     } else {
-                        showErrorMessage("Wrong username or password");
+                        model.setCurrentUser(user);  // Save the current user in the model
+                        loadHomeScene();
                     }
                 } catch (SQLException e) {
                     showErrorMessage(e.getMessage());
@@ -114,18 +120,36 @@ public class LoginController {
     }
 
 
-    // Method to load the admin dashboard scene for admins
-    private void loadAdminDashboardScene() {
+ // Method to load the admin dashboard scene for admins
+    private void loadAdminDashboardScene() throws SQLException {
         try {
+            // Load the FXML file for the Admin Dashboard
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/View/admindashboardview.fxml"));
-            AdminDashboardController adminDashboardController = new AdminDashboardController(stage, model);
-            loader.setController(adminDashboardController);
-            TabPane root = loader.load();
-            stage.getScene().setRoot(root);
+            TabPane root = loader.load();  // Load the root node (TabPane) from FXML
+
+            // Get the controller instance from the loader
+            AdminDashboardController adminController = loader.getController();
+
+            // Instantiate the BookDao and set it in the controller
+            BookDao bookDao = new BookDaoImplementation();  // Create an instance of your BookDao
+            adminController.setBookDao(bookDao);  // Call setBookDao() before the scene is shown
+
+            // Set the model and primary stage in the controller
+            adminController.setModel(model);
+            adminController.setPrimaryStage(primaryStage);
+            
+            adminController.setLoginScene(primaryStage.getScene());
+
+            // Create and set the scene
+            primaryStage.setScene(new Scene(root));
+            primaryStage.show();  // Show the primary stage
         } catch (IOException e) {
-            showErrorMessage(e.getMessage());
+            // Handle any IO or SQL exceptions that occur during loading
+            showErrorMessage("Failed to load the Admin Dashboard: " + e.getMessage());
         }
     }
+
+
 
     // Method to load the sign-up scene
     private void loadSignUpScene() {
@@ -154,5 +178,6 @@ public class LoginController {
     private void showErrorMessage(String messageText) {
         message.setText(messageText);
         message.setTextFill(Color.RED);
+        System.out.println(messageText);
     }
 }
