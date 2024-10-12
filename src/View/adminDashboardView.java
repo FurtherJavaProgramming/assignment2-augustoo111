@@ -11,13 +11,11 @@ import model.Model;
 public class adminDashboardView {
 
     private Scene loginScene;
-    private Model model;
     private Stage primaryStage;  // Reference to the main stage for scene switching
 
     // Constructor to initialize with login scene, model, and stage
     public adminDashboardView(Scene loginScene, Model model, Stage primaryStage) {
         this.loginScene = loginScene;
-        this.model = model;
         this.primaryStage = primaryStage;
     }
 
@@ -38,7 +36,6 @@ public class adminDashboardView {
 
             // Set necessary references in the controller
             controller.setLoginScene(loginScene);  // Set login scene for logout functionality
-            controller.setModel(model);  // Pass the model to interact with the backend
             controller.setPrimaryStage(primaryStage);  // Set the primary stage for scene switching
 
             return new Scene(root);  // Return the scene

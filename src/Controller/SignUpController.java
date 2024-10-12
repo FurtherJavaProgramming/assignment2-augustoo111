@@ -64,7 +64,7 @@ public class SignUpController {
                 if (passwordField.getText().equals(confirmPasswordField.getText())) {
                     try {
                         // Check if the username already exists
-                        User existingUser = model.getUserDao().getUser(userNameField.getText(), passwordField.getText());
+                        User existingUser = model.getUserDao().getUserByUsername(userNameField.getText());
                         if (existingUser != null) {
                             // Username already exists
                             showAlert(Alert.AlertType.WARNING, "Username Already Exists",
@@ -86,7 +86,7 @@ public class SignUpController {
                             if (primaryStage != null) {
                                 primaryStage.setScene(loginScene);  // Switch to login scene
                             } else {
-                                System.err.println("Primary stage is null. Cannot switch to login scene.");
+                            	 showAlert(Alert.AlertType.ERROR, "Fail to switch Scene!", "Primary stage is not found.", "Cannot switch to login scene");
                             }
                         } else {
                             showAlert(Alert.AlertType.ERROR, "Sign-Up Failed", "Failed to create user.",
@@ -114,7 +114,10 @@ public class SignUpController {
             passwordField.clear();
             confirmPasswordField.clear();
         });
+        
     }
+    
+    
 
 
     // Method to show alert messages

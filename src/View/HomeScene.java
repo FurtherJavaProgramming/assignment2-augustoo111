@@ -1,7 +1,6 @@
 package View;
 
 import java.io.IOException;
-
 import Controller.HomeSceneController;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
@@ -10,36 +9,41 @@ import javafx.stage.Stage;
 import model.Model;
 
 public class HomeScene {
-    private Scene loginScene;  // Scene to navigate back to login
-    private Stage primaryStage;  // The main application stage
-    private Model model;  // The model for application data
 
-    // Constructor to pass the login scene, the primary stage, and the model
-    public HomeScene(Scene loginScene, Stage primaryStage, Model model) {
+    private Scene loginScene;
+    private Stage primaryStage;  // Reference to the main stage for scene switching
+    private String username;  // Username to display
+
+    // Constructor to initialize with login scene, model, stage, and username
+    public HomeScene(Scene loginScene, Model model, Stage primaryStage, String username) {
         this.loginScene = loginScene;
         this.primaryStage = primaryStage;
-        this.model = model;
+        this.username = username;  // Store the username
     }
 
+    // Title for the user dashboard
     public String getTitle() {
         return "Reading Room Book Store";
     }
 
+    // Load the home scene
     public Scene getScene() {
         FXMLLoader loader = new FXMLLoader(getClass().getResource("homeview.fxml"));
 
         try {
             TabPane root = loader.load();
 
-            // Get the controller instance from the loader
-            HomeSceneController controller = loader.getController();
-            
-            // Pass the login scene, primary stage, and model to the controller
-            controller.setLoginScene(loginScene);
-            controller.setPrimaryStage(primaryStage);
-            controller.setModel(model);  // Pass the model to the controller
-            
-            return new Scene(root);
+            // Get the controller from the FXML loader
+            HomeSceneController homeController = loader.getController();
+
+            // Pass the username to the controller
+            homeController.setUsername(username);
+
+            // Set necessary references in the controller
+            homeController.setLoginScene(loginScene);  // Set login scene for logout functionality
+            homeController.setPrimaryStage(primaryStage);  // Set the primary stage for scene switching
+
+            return new Scene(root);  // Return the scene
         } catch (IOException e) {
             e.printStackTrace();
             return null;

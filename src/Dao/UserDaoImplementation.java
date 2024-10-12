@@ -39,7 +39,8 @@ public class UserDaoImplementation implements UserDao {
     @Override
     public User getUser(String username, String password) throws SQLException {
         String sql = "SELECT * FROM " + USER_TABLE + " WHERE username = ? AND password = ?";
-        try (Connection connection = Database.getConnection(); PreparedStatement stmt = connection.prepareStatement(sql);) {
+        try (Connection connection = Database.getConnection(); 
+        		PreparedStatement stmt = connection.prepareStatement(sql);) {
             stmt.setString(1, username);
             stmt.setString(2, password);
             
@@ -61,7 +62,8 @@ public class UserDaoImplementation implements UserDao {
     public User createUser(String firstName, String lastName, String username, String password) throws SQLException {
     	setup();
         String sql = "INSERT INTO " + USER_TABLE + " (firstName, lastName, username, password) VALUES (?, ?, ?, ?)";
-        try (Connection connection = Database.getConnection(); PreparedStatement stmt = connection.prepareStatement(sql);) {
+        try (Connection connection = Database.getConnection(); 
+        		PreparedStatement stmt = connection.prepareStatement(sql);) {
             stmt.setString(1, firstName);
             stmt.setString(2, lastName);
             stmt.setString(3, username);
@@ -76,7 +78,8 @@ public class UserDaoImplementation implements UserDao {
     @Override
     public AdminUser getAdminUser(String username, String password) throws SQLException {
         String sql = "SELECT * FROM " + ADMIN_TABLE + " WHERE username = ? AND password = ?";
-        try (Connection connection = Database.getConnection(); PreparedStatement stmt = connection.prepareStatement(sql);) {
+        try (Connection connection = Database.getConnection(); 
+        		PreparedStatement stmt = connection.prepareStatement(sql);) {
             stmt.setString(1, username);
             stmt.setString(2, password);
             
@@ -91,4 +94,20 @@ public class UserDaoImplementation implements UserDao {
         }
         return null;
     }
+
+	@Override
+    public User getUserByUsername(String username) throws SQLException {
+        String sql = "SELECT * FROM users WHERE username = ?";
+        try (Connection connection = Database.getConnection(); 
+        		PreparedStatement stmt = connection.prepareStatement(sql);) {
+            stmt.setString(1, username);
+            ResultSet rs = stmt.executeQuery();
+            
+            if (rs.next()) {
+                return new User(rs.getString("firstName"), rs.getString("lastName"), username, rs.getString("password"));
+            } else {
+                return null;
+            }
+        }
+	}
 }

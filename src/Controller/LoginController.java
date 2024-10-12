@@ -17,13 +17,11 @@ import javafx.stage.Stage;
 import model.AdminUser;
 import model.Model;
 import model.User;
-import model.Book;
 import Dao.BookDao;
 import Dao.BookDaoImplementation;
 
 public class LoginController {
 
-    private Stage stage;
     private Stage primaryStage;
     private Model model;  // Model class that holds the application's state and DAO reference
 
@@ -46,7 +44,6 @@ public class LoginController {
     }
 
     public LoginController(Stage stage, Model model) {
-        this.stage = stage;
         this.model = model;
     }
 
@@ -98,7 +95,7 @@ public class LoginController {
     }
 
     //Method to load the home scene for regular users
-    private void loadHomeScene() {
+    private void loadHomeScene() throws SQLException {
         try {
             // Load FXML and controller
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/View/homeview.fxml"));
@@ -106,10 +103,14 @@ public class LoginController {
 
             // Get controller instance from the FXMLLoader
             HomeSceneController homeSceneController = loader.getController();
+
+            // Instantiate the BookDao and set it in the controller
+            BookDao bookDao = new BookDaoImplementation();  // Create an instance of your BookDao
+            homeSceneController.setBookDao(bookDao);  // Call setBookDao() before the scene is shown
             
             // Set the model and primary stage
-            homeSceneController.setModel(model);
             homeSceneController.setPrimaryStage(primaryStage);
+            homeSceneController.setLoginScene(primaryStage.getScene());
 
             // Set the scene
             primaryStage.setScene(new Scene(root));
@@ -135,7 +136,7 @@ public class LoginController {
             adminController.setBookDao(bookDao);  // Call setBookDao() before the scene is shown
 
             // Set the model and primary stage in the controller
-            adminController.setModel(model);
+            //adminController.setModel(model);
             adminController.setPrimaryStage(primaryStage);
             
             adminController.setLoginScene(primaryStage.getScene());
@@ -178,6 +179,5 @@ public class LoginController {
     private void showErrorMessage(String messageText) {
         message.setText(messageText);
         message.setTextFill(Color.RED);
-        System.out.println(messageText);
     }
 }

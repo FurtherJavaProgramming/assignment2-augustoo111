@@ -1,7 +1,5 @@
 package Controller;
 
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
@@ -11,7 +9,6 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.Stage;
-import model.Model;
 import model.Book;
 
 import java.sql.SQLException;
@@ -41,7 +38,6 @@ public class AdminDashboardController {
     
 
     private Scene loginScene;  // Reference to the login scene
-    private Model model;  // Reference to the model for interaction with DAO
     private Stage primaryStage;  // Reference to the primary stage
     private BookDao bookDao;
 
@@ -51,14 +47,16 @@ public class AdminDashboardController {
         this.bookDao = bookDao;
         loadBookData();
     }
-
-
     
     // Set the login scene to switch back after logging out
     public void setLoginScene(Scene loginScene) {
         this.loginScene = loginScene;
     }
-
+    
+    // Setter method for the Primary Stage
+    public void setPrimaryStage(Stage primaryStage) {
+        this.primaryStage = primaryStage;
+    }
     
 
     @FXML
@@ -179,15 +177,8 @@ public class AdminDashboardController {
         alert.showAndWait();
     }
 
-    // Setter method for the Model
-    public void setModel(Model model) {
-        this.model = model;
-    }
 
-    // Setter method for the Primary Stage
-    public void setPrimaryStage(Stage primaryStage) {
-        this.primaryStage = primaryStage;
-    }
+
 
 
 }

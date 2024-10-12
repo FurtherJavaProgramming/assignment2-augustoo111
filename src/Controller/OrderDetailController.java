@@ -7,6 +7,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
+import model.Model;
 import javafx.event.ActionEvent;
 
 
@@ -42,7 +43,7 @@ public class OrderDetailController {
     	Button backToHomeButton = (Button) e.getSource();
         Stage primaryStage = (Stage) backToHomeButton.getScene().getWindow();
 		primaryStage.setScene(accountScene);
-		HomeScene homeScene = new HomeScene(backToHomeButton.getScene(), primaryStage, null);
+		HomeScene homeScene = new HomeScene(backToHomeButton.getScene(), null, primaryStage, null);
         primaryStage.setTitle(homeScene.getTitle());
         primaryStage.setScene(homeScene.getScene());
         

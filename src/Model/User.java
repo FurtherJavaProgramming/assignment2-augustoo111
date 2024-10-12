@@ -1,5 +1,11 @@
 package model;
 
+/**
+ * Represents a user in the system.
+ * This class stores the user's personal information and credentials,
+ * including their first name, last name, username, and password.
+ */
+
 public class User {
     private String firstName;
     private String lastName;

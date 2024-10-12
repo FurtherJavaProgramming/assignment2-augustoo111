@@ -16,48 +16,76 @@
     <tabs>
 
         <!-- Home Tab -->
-        <Tab fx:id="homeTab" text="HOME">
-            <content>
-                <GridPane alignment="CENTER" hgap="10" prefHeight="600.0" prefWidth="800.0" style="-fx-padding: 30;" vgap="10">
+<Tab fx:id="homeTab" text="HOME">
+    <content>
+        <GridPane alignment="CENTER" hgap="10" prefHeight="600.0" prefWidth="800.0" style="-fx-padding: 30;" vgap="10">
+            <!-- Column Constraints -->
+            <columnConstraints>
+                <ColumnConstraints hgrow="ALWAYS" />
+            </columnConstraints>
+
+            <!-- Row Constraints -->
+            <rowConstraints>
+                <RowConstraints minHeight="50.0" vgrow="SOMETIMES" />
+                <RowConstraints minHeight="50.0" vgrow="SOMETIMES" />
+                <RowConstraints minHeight="50.0" vgrow="SOMETIMES" />
+                <RowConstraints minHeight="50.0" vgrow="SOMETIMES" />
+                <RowConstraints minHeight="50.0" vgrow="SOMETIMES" />
+            </rowConstraints>
+
+            <children>
+                <!-- Welcome Text, centered -->
+                <Text fill="#117bd6" style="-fx-font-size: 24px; -fx-font-weight: bold;" text="Welcome to Reading Room Book Store" GridPane.halignment="CENTER" GridPane.rowIndex="0" />
+
+                <!-- Username Label, centered -->
+                <Label fx:id="userNameLabel" style="-fx-font-size: 18px; -fx-text-fill: #333;" text="User Name" GridPane.halignment="CENTER" GridPane.rowIndex="1" />
+
+                <!-- Top 5 Popular Books Table -->
+                <Label style="-fx-font-size: 18px; -fx-font-weight: bold;" text="Top 5 Popular Books" GridPane.halignment="CENTER" GridPane.rowIndex="2" />
+
+                <!-- Table for Top Books -->
+                <TableView fx:id="bookStockTable" prefHeight="300.0" prefWidth="700.0" GridPane.halignment="CENTER" GridPane.rowIndex="3">
+                    <columns>
+                        <TableColumn fx:id="titleColumn" prefWidth="208.0" text="BOOK TITLE" />
+                        <TableColumn fx:id="authorColumn" prefWidth="124.0" text="AUTHORS" />
+                        <TableColumn fx:id="noOfCopiesColumn" prefWidth="114.4" text="PHYSICAL COPIES" />
+                        <TableColumn fx:id="priceColumn" prefWidth="186.8" text="PRICE (AUD)" />
+                        <TableColumn fx:id="soldCopiesColumn" prefWidth="108.0" text="SOLD COPIES" />
+                    </columns>
+                </TableView>
+
+                <!-- Book Selection and Quantity Section -->
+                <GridPane hgap="10" vgap="10" GridPane.rowIndex="4">
                     <!-- Column Constraints -->
                     <columnConstraints>
-                        <ColumnConstraints hgrow="ALWAYS" />
+                        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="200.0" />
+                        <ColumnConstraints hgrow="SOMETIMES" maxWidth="115.60006713867188" minWidth="10.0" prefWidth="54.800079345703125" />
+                        <ColumnConstraints hgrow="SOMETIMES" maxWidth="138.79995727539062" minWidth="10.0" prefWidth="135.19992065429688" />
+                        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="150.0" />
                     </columnConstraints>
 
-                    <!-- Row Constraints -->
                     <rowConstraints>
                         <RowConstraints minHeight="50.0" vgrow="SOMETIMES" />
-                        <RowConstraints minHeight="50.0" vgrow="SOMETIMES" />
-                        <RowConstraints minHeight="50.0" vgrow="SOMETIMES" />
-                        <RowConstraints minHeight="50.0" vgrow="SOMETIMES" />
-                  <RowConstraints />
                     </rowConstraints>
 
                     <children>
-                        <!-- Welcome Text, centered -->
-                        <Text fill="#117bd6" style="-fx-font-size: 24px; -fx-font-weight: bold;" text="Welcome to Reading Room Book Store" GridPane.halignment="CENTER" GridPane.rowIndex="0" />
+                        <!-- Selected Book Label and Field -->
+                        <Label text="Selected Book:" GridPane.columnIndex="0" />
+                        <TextField fx:id="selectedBookField" editable="false" prefWidth="200" promptText="selected item" GridPane.columnIndex="1" />
+                        <!-- Quantity Label and Field -->
+                        <Label text="Quantity:" GridPane.columnIndex="2" />
+                        <TextField fx:id="quantityField" prefWidth="50" promptText="enter quantity" GridPane.columnIndex="3" />
 
-                        <!-- Username Label, centered -->
-                        <Label fx:id="userNameLabel" style="-fx-font-size: 18px; -fx-text-fill: #333;" text="User Name" GridPane.halignment="CENTER" GridPane.rowIndex="1" />
-
-                        <!-- Top 5 Popular Books Table -->
-                        <Label style="-fx-font-size: 18px; -fx-font-weight: bold;" text="Top 5 Popular Books" GridPane.halignment="CENTER" GridPane.rowIndex="2" />
-
-                        <!-- Table for Top Books -->
-                        <TableView fx:id="topBooksTable" prefHeight="300.0" prefWidth="700.0" GridPane.halignment="CENTER" GridPane.rowIndex="3">
-                            <columns>
-                                <TableColumn prefWidth="261.9999752044678" text="BOOK TITLE" />
-                                <TableColumn prefWidth="124.79998779296875" text="AUTHORS" />
-                                <TableColumn prefWidth="132.39999389648438" text="PHYSICAL COPIES" />
-                                <TableColumn prefWidth="112.79998779296875" text="PRICE (AUD)" />
-                                <TableColumn prefWidth="107.60003662109375" text="SOLD COPIES" />
-                            </columns>
-                        </TableView>
-                  <Button mnemonicParsing="false" text="Add to Cart" GridPane.halignment="CENTER" GridPane.rowIndex="4" />
+                        <!-- Add to Cart Button -->
+                        <Button fx:id="addCartButton" mnemonicParsing="false" onAction="#addToCart" text="Add to Cart" GridPane.columnIndex="4" />
                     </children>
                 </GridPane>
-            </content>
-        </Tab>
+            </children>
+        </GridPane>
+    </content>
+</Tab>
+
 
         <!-- Shopping Cart Tab (Adjusted with GridPane Only) -->
         <Tab fx:id="cartTab" text="Cart">
@@ -74,7 +102,7 @@
                         <RowConstraints minHeight="50.0" vgrow="SOMETIMES" />
                         <RowConstraints minHeight="50.0" vgrow="SOMETIMES" />
                         <RowConstraints minHeight="50.0" vgrow="SOMETIMES" />
-                  <RowConstraints />
+                        <RowConstraints />
                     </rowConstraints>
 
                     <children>
@@ -87,10 +115,10 @@
                         <!-- Table for Cart Items -->
                         <TableView fx:id="cartListView" prefHeight="300.0" prefWidth="700.0" GridPane.halignment="CENTER" GridPane.rowIndex="2">
                             <columns>
-                                <TableColumn prefWidth="200.0" text="BOOK TITLE" />
-                                <TableColumn prefWidth="150.0" text="AUTHORS" />
-                                <TableColumn prefWidth="100.0" text="QUANTITY" />
-                                <TableColumn prefWidth="100.0" text="PRICE" />
+                                <TableColumn fx:id="cartTitleColumn" prefWidth="200.0" text="BOOK TITLE" />
+                                <TableColumn fx:id="cartAuthorColumn" prefWidth="150.0" text="AUTHORS" />
+                                <TableColumn fx:id="cartQuantityColumn" prefWidth="100.0" text="QUANTITY" />
+                                <TableColumn fx:id="cartPriceColumn" prefWidth="100.0" text="PRICE" />
                             </columns>
                         </TableView>
 
@@ -106,15 +134,16 @@
                             </columnConstraints>
                             <children>
                                 <Label text="Selected Book:" GridPane.columnIndex="0" />
-                                <TextField fx:id="selectedBookField" editable="false" prefWidth="200" GridPane.columnIndex="1" />
+								<TextField fx:id="cartSelectedBookField" editable="false" prefWidth="200" GridPane.columnIndex="1" />
+                                
                                 <Label text="Quantity:" GridPane.columnIndex="2" />
-                                <TextField fx:id="quantityField" prefWidth="50" GridPane.columnIndex="3" />
+                                <TextField fx:id="cartQuantityField" prefWidth="50" GridPane.columnIndex="3" />
                                 <Button onAction="#updateQuantity" text="Update Quantity" GridPane.columnIndex="4" />
                                 <Button text="Remove" GridPane.columnIndex="5" />
                             </children>
-                     <rowConstraints>
-                        <RowConstraints />
-                     </rowConstraints>
+                            <rowConstraints>
+                                <RowConstraints />
+                            </rowConstraints>
                         </GridPane>
 
                         <!-- Buttons for Continue Shopping and Check Out, centered -->
@@ -127,9 +156,9 @@
                                 <Button fx:id="continueShoppingButton" onAction="#continueShopping" text="Continue Shopping" GridPane.columnIndex="0" />
                                 <Button fx:id="checkOutButton" onAction="#checkOut" text="Check Out" GridPane.columnIndex="1" />
                             </children>
-                     <rowConstraints>
-                        <RowConstraints />
-                     </rowConstraints>
+                            <rowConstraints>
+                                <RowConstraints />
+                            </rowConstraints>
                         </GridPane>
                     </children>
                 </GridPane>
