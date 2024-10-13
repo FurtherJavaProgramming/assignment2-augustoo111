@@ -139,7 +139,7 @@
                                 <Label text="Quantity:" GridPane.columnIndex="2" />
                                 <TextField fx:id="cartQuantityField" prefWidth="50" GridPane.columnIndex="3" />
                                 <Button onAction="#updateQuantity" text="Update Quantity" GridPane.columnIndex="4" />
-                                <Button text="Remove" GridPane.columnIndex="5" />
+                                <Button onAction="#removeBookFromCart" text="Remove" GridPane.columnIndex="5" />
                             </children>
                             <rowConstraints>
                                 <RowConstraints />

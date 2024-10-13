@@ -4,6 +4,7 @@ import javafx.fxml.FXML;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
@@ -14,6 +15,7 @@ import model.Book;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import Dao.BookDao;
+import Dao.UserDao;
 
 public class AdminDashboardController {
 
@@ -29,10 +31,10 @@ public class AdminDashboardController {
     private TableColumn<Book, Integer> soldCopiesColumn;
     @FXML
     private TableColumn<Book, Integer> noOfCopiesColumn;
-
+    @FXML
+    private Label adminNameLabel;
     @FXML
     private TextField selectedBookField, stockUpdateField;  // Field for updating stock quantity
-
     @FXML
     private Button logOutButton, updateStockButton;  // Buttons
     
@@ -40,6 +42,7 @@ public class AdminDashboardController {
     private Scene loginScene;  // Reference to the login scene
     private Stage primaryStage;  // Reference to the primary stage
     private BookDao bookDao;
+    private String username;
 
 
  // Setter method to inject the BookDao instance
@@ -58,6 +61,18 @@ public class AdminDashboardController {
         this.primaryStage = primaryStage;
     }
     
+    public void setUserDao(UserDao userDao) {
+		
+		
+	}
+  // Method to set the username in the label
+    public void setUsername(String username) {
+        this.username = username;  // Store the username
+        if (adminNameLabel != null) {
+        	adminNameLabel.setText("Welcome " + username); // Set the username in the label
+        }
+    }
+    
 
     @FXML
     public void initialize() {
@@ -74,6 +89,10 @@ public class AdminDashboardController {
                 selectedBookField.setText(newSelection.getTitle());
             }
         });
+        
+        if (username != null) {
+        	adminNameLabel.setText("Welcome " + username);
+        }
     }
     
 

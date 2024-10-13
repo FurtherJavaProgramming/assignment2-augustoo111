@@ -1,6 +1,8 @@
 package Controller;
 
 
+import java.sql.SQLException;
+
 import View.HomeScene;
 import javafx.fxml.FXML;
 import javafx.scene.Scene;
@@ -39,7 +41,7 @@ public class OrderDetailController {
 
     // Method to handle "Back to Home" button click
     @FXML
-    public void goBackToHome(ActionEvent e) {
+    public void goBackToHome(ActionEvent e) throws SQLException {
     	Button backToHomeButton = (Button) e.getSource();
         Stage primaryStage = (Stage) backToHomeButton.getScene().getWindow();
 		primaryStage.setScene(accountScene);

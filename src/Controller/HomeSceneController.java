@@ -4,12 +4,11 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 
 import Dao.BookDao;
+import Dao.UserDao;
 import View.CheckOutView;
 import View.ViewOrderView;
 import View.updatePasswordView;
 import View.updateProfileView;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Scene;
@@ -60,26 +59,40 @@ public class HomeSceneController {
 
     @FXML
     private Label userNameLabel, cartLabel;
+    
 
     
 
 	private Scene loginScene;  // Reference to the login scene
 	private Stage primaryStage;  // Reference to the primary stage
 	private BookDao bookDao;
+	private String username;
     
 
     // Default constructor
     public HomeSceneController() {}
+
 
     // Constructor to pass the primary stage and model
     public HomeSceneController(Stage primaryStage, Model model) {
     	this.primaryStage = primaryStage;
     }
 
- // Setter method to inject the BookDao instance
+  // Setter method to inject the BookDao instance
     public void setBookDao(BookDao bookDao) {
         this.bookDao = bookDao;
         loadBookData();
+    }
+    public void setUserDao(UserDao userDao) {
+		
+		
+	}
+  // Method to set the username in the label
+    public void setUsername(String username) {
+        this.username = username;  // Store the username
+        if (userNameLabel != null) {
+            userNameLabel.setText(username); // Set the username in the label
+        }
     }
 
 
@@ -87,28 +100,28 @@ public class HomeSceneController {
     public void setLoginScene(Scene loginScene) {
         this.loginScene = loginScene;
     }
- // Method to set the username in the label
-    public void setUsername(String username) {
-        userNameLabel.setText(username);
-    }
     
+
+  
     // Setter method for the Primary Stage
     public void setPrimaryStage(Stage primaryStage) {
         this.primaryStage = primaryStage;
     }
-
+      // Setter method for the Model
     public void setModel(Model model) {
     }
+
     private ArrayList<Book> cartItems = new ArrayList<>();
 
-    @FXML
-    public void initialize() {
+	@FXML
+    public void initialize() throws SQLException {
         // Set up table columns with properties
         titleColumn.setCellValueFactory(new PropertyValueFactory<>("title"));
         authorColumn.setCellValueFactory(new PropertyValueFactory<>("author"));
         priceColumn.setCellValueFactory(new PropertyValueFactory<>("price"));
         soldCopiesColumn.setCellValueFactory(new PropertyValueFactory<>("soldCopies"));
         noOfCopiesColumn.setCellValueFactory(new PropertyValueFactory<>("noOfCopies"));
+        
      // Add listener to the table to get selected book
         bookStockTable.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) -> {
             if (newSelection != null) {
@@ -121,15 +134,23 @@ public class HomeSceneController {
         cartTitleColumn.setCellValueFactory(new PropertyValueFactory<>("title"));
         cartAuthorColumn.setCellValueFactory(new PropertyValueFactory<>("author"));
         cartQuantityColumn.setCellValueFactory(new PropertyValueFactory<>("noOfCopies"));  // Using noOfCopies to represent quantity in the cart
-        cartPriceColumn.setCellValueFactory(new PropertyValueFactory<>("price"));
+        cartPriceColumn.setCellValueFactory(new PropertyValueFactory<>("totalPrice"));
 
         // Add listener to cartListView to show selected item in fields
         cartListView.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) -> {
             if (newSelection != null) {
-                selectedBookField.setText(newSelection.getTitle());
-                quantityField.setText(String.valueOf(newSelection.getNoOfCopies()));
+                cartSelectedBookField.setText(newSelection.getTitle());
+                cartQuantityField.setText(String.valueOf(newSelection.getNoOfCopies()));
             }
         });
+     
+        // Set up buttons in the Cart tab
+        checkOutButton.setOnAction(e -> checkOut(e));
+        continueShoppingButton.setOnAction(e -> continueShopping());
+        
+		if (username != null) {
+            userNameLabel.setText(username);
+        }
     }
     // Method to load all books from the DAO and display in the table
     private void loadBookData() {
@@ -156,8 +177,8 @@ public class HomeSceneController {
     }
 
     
-    // Method to add a book to the cart
     @FXML
+    //method for add to cart button
     public void addToCart() {
         // Get the selected book from the bookStockTable
         Book selectedBook = bookStockTable.getSelectionModel().getSelectedItem();
@@ -166,7 +187,7 @@ public class HomeSceneController {
 
         // Check if a book is selected
         if (chooseItem == null || chooseItem.isEmpty()) {
-            showAlert(Alert.AlertType.WARNING, "No Book Selected", "Please select a book to update.");
+            showAlert(Alert.AlertType.WARNING, "No Book Selected", "Please select a book to add to the cart.");
             return;
         }
 
@@ -179,31 +200,66 @@ public class HomeSceneController {
         try {
             // Parse the quantity entered by the user
             int quantity = Integer.parseInt(quantityText);
-
-            // Ensure the quantity is non-negative
             if (quantity <= 0) {
-                showAlert(Alert.AlertType.ERROR, "Invalid Quantity", "Quantity must be a positive number.");
+            	showAlert(Alert.AlertType.ERROR, "Invalid Quantity", 
+                        "Quantity must be greater than 0!");
+              return;
+            }
+
+            // Get the available copies of the selected book
+            int availableCopies = selectedBook.getNoOfCopies();
+
+            // Check if the book is already in the cart
+            Book bookInCart = findBookInCart(selectedBook);
+            
+            
+
+            // If the book is already in the cart, reduce the available copies based on what is in the cart
+            int alreadyInCart = bookInCart != null ? bookInCart.getNoOfCopies() : 0;
+            int remainingCopies = availableCopies - alreadyInCart;
+      
+
+            // Validate the quantity (must be less than or equal to available copies if not in cart)
+            if (quantity > availableCopies) {
+                showAlert(Alert.AlertType.ERROR, "Exceeds Available Stock", 
+                          "You can only add up to " + availableCopies + " copies.");
                 return;
             }
 
-            // Create a copy of the selected book with the updated quantity for the cart
-            Book bookInCart = new Book(
-                selectedBook.getTitle(),
-                selectedBook.getAuthor(),
-                quantity, // Set the quantity in the cart
-                selectedBook.getPrice(),
-                selectedBook.getSoldCopies()
-            );
+            // Validate the quantity (must be positive and less than or equal to remaining available copies)
+            if (quantity > remainingCopies) {
+                showAlert(Alert.AlertType.ERROR, "Invalid Quantity", 
+                		"You already have " + bookInCart.getNoOfCopies() +
+                         " in your cart. Your remaining copies (" + remainingCopies + ").");
+                return;
+            }
 
-            // Add the book to the cart
-            cartItems.add(bookInCart);
+         // Calculate the total price for the selected books (unit price * quantity)
+            double totalPrice = selectedBook.getPrice() * quantity;
+
+            if (bookInCart != null) {
+                // If the book is already in the cart, update the quantity and recalculate the total price
+                bookInCart.setNoOfCopies(bookInCart.getNoOfCopies() + quantity);  // Update the quantity
+                bookInCart.setTotalPrice(bookInCart.getNoOfCopies() * selectedBook.getPrice());  // Set total price
+            } else {
+                // If the book is not in the cart, create a new entry with the specified quantity and unit price
+                bookInCart = new Book(
+                    selectedBook.getTitle(),
+                    selectedBook.getAuthor(),
+                    quantity,  // Set the quantity in the cart
+                    selectedBook.getPrice(),  // Use the unit price here
+                    selectedBook.getSoldCopies()
+                );
+                bookInCart.setTotalPrice(totalPrice);  // Set the total price for the new book
+                cartItems.add(bookInCart);  // Add to the cart
+            }
+
             // Refresh the cartListView by resetting its items
             cartListView.getItems().clear();
             cartListView.getItems().addAll(cartItems);
-
-            // Show success message
+            // Show success message including the total price
             showAlert(Alert.AlertType.INFORMATION, "Book Added to Cart", 
-                      "Book \"" + selectedBook.getTitle() + "\" has been added to the cart with quantity " + quantity + ".");
+                      "Book \"" + selectedBook.getTitle() + "\" has been added to the cart");
 
             // Optionally, clear the selected fields for a new selection
             selectedBookField.clear();
@@ -213,6 +269,110 @@ public class HomeSceneController {
             // If the quantity entered is not a valid number
             showAlert(Alert.AlertType.ERROR, "Invalid Quantity", "Please enter a valid number for the quantity.");
         }
+    }
+
+    // Helper method to find a book in the cart
+    private Book findBookInCart(Book selectedBook) {
+        for (Book book : cartItems) {
+            if (book.getTitle().equals(selectedBook.getTitle()) && book.getAuthor().equals(selectedBook.getAuthor())) {
+                return book;  // Return the book if found in the cart
+            }
+        }
+        return null;  // Return null if the book is not in the cart
+    }
+    
+    // update quantity button
+    @FXML
+    public void updateQuantity() {
+        // Get the selected book from the cartListView
+        Book selectedBook = cartListView.getSelectionModel().getSelectedItem();
+        
+        // Check if a book is selected
+        if (selectedBook == null) {
+            showAlert(Alert.AlertType.WARNING, "No Book Selected", "Please select a book from the cart to update.");
+            return;
+        }
+
+        String newQuantityText = cartQuantityField.getText();
+        
+        // Check if a valid quantity is entered
+        if (newQuantityText == null || newQuantityText.isEmpty()) {
+            showAlert(Alert.AlertType.WARNING, "No Quantity Entered", "Please enter a quantity.");
+            return;
+        }
+
+        try {
+            int newQuantity = Integer.parseInt(newQuantityText);
+
+            // Validate the new quantity (must be positive)
+            if (newQuantity <= 0) {
+                showAlert(Alert.AlertType.ERROR, "Invalid Quantity", "Quantity must be greater than 0.");
+                return;
+            }
+
+            // Check if the new quantity exceeds the available stock
+            Book bookInStock = findBookInStock(selectedBook);
+            if (bookInStock == null) {
+                showAlert(Alert.AlertType.ERROR, "Book Not Found", "The selected book is not available in stock.");
+                return;
+            }
+
+            int availableCopies = bookInStock.getNoOfCopies();
+            if (newQuantity > availableCopies) {
+                showAlert(Alert.AlertType.ERROR, "Invalid Quantity", "Quantity exceeds available stock (" + availableCopies + ").");
+                return;
+            }
+
+            // Update the quantity and total price in the cart
+            selectedBook.setNoOfCopies(newQuantity);
+            selectedBook.setTotalPrice(newQuantity * selectedBook.getPrice());
+
+            // Refresh the cart list view to show updated quantity and price
+            cartListView.refresh();
+
+            // Clear the quantity field after updating
+            cartQuantityField.clear();
+
+            showAlert(Alert.AlertType.INFORMATION, "Quantity Updated", "The quantity for \"" + selectedBook.getTitle() + "\" has been updated to " + newQuantity + ".");
+        } catch (NumberFormatException e) {
+            showAlert(Alert.AlertType.ERROR, "Invalid Quantity", "Please enter a valid number for the quantity.");
+        }
+    }
+
+
+    // Helper method to find the corresponding book in the stock table
+    private Book findBookInStock(Book selectedBook) {
+        for (Book book : bookStockTable.getItems()) {
+            if (book.getTitle().equals(selectedBook.getTitle()) && book.getAuthor().equals(selectedBook.getAuthor())) {
+                return book;
+            }
+        }
+        return null;
+    }
+    
+    @FXML
+    public void removeBookFromCart() {
+        // Get the selected book from the cartListView
+        Book selectedBook = cartListView.getSelectionModel().getSelectedItem();
+
+        // Check if a book is selected from the cart
+        if (selectedBook == null) {
+            showAlert(Alert.AlertType.WARNING, "No Book Selected", "Please select a book to remove.");
+            return;
+        }
+
+        // Remove the selected book from the cartItems list
+        cartItems.remove(selectedBook);
+
+        // Refresh the cartListView to reflect the removed item
+        cartListView.getItems().clear();
+        cartListView.getItems().addAll(cartItems);
+
+        // Clear the selected fields after removing
+        cartSelectedBookField.clear();
+        cartQuantityField.clear();
+
+        showAlert(Alert.AlertType.INFORMATION, "Book Removed", "The book \"" + selectedBook.getTitle() + "\" has been removed from the cart.");
     }
 
     
@@ -280,14 +440,6 @@ public class HomeSceneController {
         primaryStage.setScene(viewOrder.getScene());
     }
 
-    @FXML
-    public void updateQuantity() {
-        Book selectedBook = cartListView.getSelectionModel().getSelectedItem();
-        if (selectedBook != null && !quantityField.getText().isEmpty()) {
-            int quantity = Integer.parseInt(quantityField.getText());
-            System.out.println("Updated quantity for " + selectedBook + ": " + quantity);
-        }
-    }
 
     public void selectShoppingCartTab() {
         if (tabPane != null && cartTab != null) {
@@ -309,5 +461,8 @@ public class HomeSceneController {
         alert.setContentText(content);
         alert.showAndWait();
     }
+
+
+	
 
 }

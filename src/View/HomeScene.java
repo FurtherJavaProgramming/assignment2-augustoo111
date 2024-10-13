@@ -1,6 +1,8 @@
 package View;
 
 import java.io.IOException;
+import java.sql.SQLException;
+
 import Controller.HomeSceneController;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
@@ -27,7 +29,7 @@ public class HomeScene {
     }
 
     // Load the home scene
-    public Scene getScene() {
+    public Scene getScene() throws SQLException {
         FXMLLoader loader = new FXMLLoader(getClass().getResource("homeview.fxml"));
 
         try {
@@ -37,7 +39,7 @@ public class HomeScene {
             HomeSceneController homeController = loader.getController();
 
             // Pass the username to the controller
-            homeController.setUsername(username);
+            homeController.setUsername(username); 
 
             // Set necessary references in the controller
             homeController.setLoginScene(loginScene);  // Set login scene for logout functionality

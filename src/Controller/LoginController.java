@@ -18,6 +18,8 @@ import model.AdminUser;
 import model.Model;
 import model.User;
 import Dao.BookDao;
+import Dao.UserDao;
+import Dao.UserDaoImplementation;
 import Dao.BookDaoImplementation;
 
 public class LoginController {
@@ -105,12 +107,16 @@ public class LoginController {
             HomeSceneController homeSceneController = loader.getController();
 
             // Instantiate the BookDao and set it in the controller
-            BookDao bookDao = new BookDaoImplementation();  // Create an instance of your BookDao
-            homeSceneController.setBookDao(bookDao);  // Call setBookDao() before the scene is shown
+            BookDao bookDao = new BookDaoImplementation();  
+            homeSceneController.setBookDao(bookDao);  
+         // Instantiate the userDao and set it in the controller
+            UserDao userDao = new UserDaoImplementation();
+            homeSceneController.setUserDao(userDao);
             
-            // Set the model and primary stage
+            // Set primary stage, loginScene and username
             homeSceneController.setPrimaryStage(primaryStage);
             homeSceneController.setLoginScene(primaryStage.getScene());
+            homeSceneController.setUsername(model.getCurrentUser().getUsername());  // Pass the current user's username
 
             // Set the scene
             primaryStage.setScene(new Scene(root));
@@ -119,6 +125,7 @@ public class LoginController {
             showErrorMessage(e.getMessage());
         }
     }
+
 
 
  // Method to load the admin dashboard scene for admins
@@ -132,14 +139,17 @@ public class LoginController {
             AdminDashboardController adminController = loader.getController();
 
             // Instantiate the BookDao and set it in the controller
-            BookDao bookDao = new BookDaoImplementation();  // Create an instance of your BookDao
-            adminController.setBookDao(bookDao);  // Call setBookDao() before the scene is shown
-
-            // Set the model and primary stage in the controller
-            //adminController.setModel(model);
-            adminController.setPrimaryStage(primaryStage);
+            BookDao bookDao = new BookDaoImplementation();  
+            adminController.setBookDao(bookDao);  
             
+            // Instantiate the userDao and set it in the controller
+            UserDao userDao = new UserDaoImplementation();
+            adminController.setUserDao(userDao);
+
+            // Set primary stage, loginScene and username
+            adminController.setPrimaryStage(primaryStage);
             adminController.setLoginScene(primaryStage.getScene());
+            adminController.setUsername(model.getCurrentUser().getUsername());
 
             // Create and set the scene
             primaryStage.setScene(new Scene(root));
@@ -161,9 +171,10 @@ public class LoginController {
 
             // Get the SignUpController and set the primaryStage and model
             SignUpController signUpController = loader.getController();
+            // Set the model, primary stage and username
             signUpController.setModel(model);
-            signUpController.setPrimaryStage(primaryStage);  // Pass the primaryStage
-            signUpController.setLoginScene(primaryStage.getScene());  // Set the login scene for navigation back
+            signUpController.setPrimaryStage(primaryStage); 
+            signUpController.setLoginScene(primaryStage.getScene());
 
             Scene signUpScene = new Scene(root);
             primaryStage.setScene(signUpScene);  // Switch to sign-up scene

@@ -10,6 +10,7 @@ public class Book implements ShoppingCart {
     private int noOfCopies;
     private double price;
     private int soldCopies;
+    private double totalPrice;
 
     // Constructor
     public Book(String title, String author, int noOfCopies, double price, int soldCopies) {
@@ -18,6 +19,7 @@ public class Book implements ShoppingCart {
         this.noOfCopies = noOfCopies;
         this.price = price;
         this.soldCopies = soldCopies;
+        this.totalPrice = price * noOfCopies;
     }
 
     // Getters and setters
@@ -62,6 +64,14 @@ public class Book implements ShoppingCart {
     @Override
     public void setSoldCopies(int soldCopies) {
         this.soldCopies = soldCopies;
+    }
+    
+    public double getTotalPrice() {
+        return totalPrice;
+    }
+
+    public void setTotalPrice(double totalPrice) {
+        this.totalPrice = totalPrice;
     }
 
     // Implementing getDetail() method from ShoppingCart interface
