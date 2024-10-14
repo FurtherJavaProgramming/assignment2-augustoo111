@@ -15,6 +15,10 @@ public class HomeScene {
     private Scene loginScene;
     private Stage primaryStage;  // Reference to the main stage for scene switching
     private String username;  // Username to display
+    
+    public HomeScene(Scene loginScene) {
+        this.loginScene = loginScene;
+    }
 
     // Constructor to initialize with login scene, model, stage, and username
     public HomeScene(Scene loginScene, Model model, Stage primaryStage, String username) {
@@ -40,10 +44,11 @@ public class HomeScene {
 
             // Pass the username to the controller
             homeController.setUsername(username); 
-
+            
             // Set necessary references in the controller
             homeController.setLoginScene(loginScene);  // Set login scene for logout functionality
             homeController.setPrimaryStage(primaryStage);  // Set the primary stage for scene switching
+            homeController.selectShoppingCartTab(); //set shoppingcart tab for scene switching
 
             return new Scene(root);  // Return the scene
         } catch (IOException e) {

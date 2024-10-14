@@ -1,19 +1,22 @@
 package Controller;
 
+import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
-
 import Dao.BookDao;
 import Dao.UserDao;
 import View.CheckOutView;
-import View.ViewOrderView;
+import View.LoginScene;
+import View.OrderDetailView;
 import View.updatePasswordView;
 import View.updateProfileView;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
 import model.Book;
 import model.Model;
@@ -67,6 +70,7 @@ public class HomeSceneController {
 	private Stage primaryStage;  // Reference to the primary stage
 	private BookDao bookDao;
 	private String username;
+	private Model model;
     
 
     // Default constructor
@@ -401,18 +405,12 @@ public class HomeSceneController {
     @FXML
     public void logOut() {
         
-//        Stage primaryStage = (Stage) logOutButton.getScene().getWindow();
-//        LoginScene loginScene = new LoginScene(model, primaryStage);
-//        primaryStage.setTitle(loginScene.getTitle());
-//        primaryStage.setScene(loginScene.getScene());
-        if (loginScene != null) {
-            // Log out the user, switch back to the login scene
-            primaryStage.setScene(loginScene);
-            primaryStage.show();  // Make sure the stage is shown
-        } else {
-            // If the login scene is not set, show an alert
-            showAlert(Alert.AlertType.WARNING, "Logout Failed", "Unable to log out. The login scene is not set.");
-        }
+        Stage primaryStage = (Stage) logOutButton.getScene().getWindow();
+        
+		LoginScene loginScene = new LoginScene(model, primaryStage);
+        primaryStage.setTitle(loginScene.getTitle());
+        primaryStage.setScene(loginScene.getScene());
+       
         
     }
 
@@ -424,18 +422,53 @@ public class HomeSceneController {
         }
     }
 
+
+ // In HomeSceneController
     @FXML
     public void checkOut(ActionEvent e) {
-        Stage primaryStage = (Stage) ((Button) e.getSource()).getScene().getWindow();
-        CheckOutView checkoutScene = new CheckOutView(primaryStage.getScene());
-        primaryStage.setTitle(checkoutScene.getTitle());
-        primaryStage.setScene(checkoutScene.getScene());
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/View/checkOutView.fxml"));
+            GridPane root = loader.load();
+
+            CheckOutController checkOutController = loader.getController();
+            checkOutController.setShoppingCartScene(primaryStage.getScene());
+            checkOutController.setHomeController(this);  // Pass HomeSceneController
+
+            Scene checkOutScene = new Scene(root);
+            primaryStage.setScene(checkOutScene);
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
     }
+
+    
+
+    
+    
+    // Method to calculate total amount
+    private double calculateTotalAmount() {
+        double total = 0;
+        for (Book book : cartItems) {
+            total += book.getTotalPrice();  // Assuming Book has a getTotalPrice() method
+        }
+        return total;
+    }
+    
+   // Method to calculate the total quantity of books in the cart
+    private int calculateTotalItems() {
+        int totalQuantity = 0;
+        for (Book book : cartItems) {
+            totalQuantity += book.getNoOfCopies();  // Sum the quantities of each book
+        }
+        return totalQuantity;
+    }
+
+
 
     @FXML
     public void viewOrder(ActionEvent e) {
         Stage primaryStage = (Stage) ((Button) e.getSource()).getScene().getWindow();
-        ViewOrderView viewOrder = new ViewOrderView(primaryStage.getScene());
+        OrderDetailView viewOrder = new OrderDetailView(primaryStage.getScene());
         primaryStage.setTitle(viewOrder.getTitle());
         primaryStage.setScene(viewOrder.getScene());
     }
@@ -444,7 +477,7 @@ public class HomeSceneController {
     public void selectShoppingCartTab() {
         if (tabPane != null && cartTab != null) {
             tabPane.getSelectionModel().select(cartTab);
-            System.out.println("Switched to shopping cart tab!");
+            
         }
     }
 

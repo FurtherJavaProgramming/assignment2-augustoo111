@@ -1,8 +1,6 @@
 package Dao;
 
 import java.sql.SQLException;
-import java.util.ArrayList;
-
 import model.AdminUser;
 import model.User;
 
