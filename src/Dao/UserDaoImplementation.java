@@ -110,4 +110,46 @@ public class UserDaoImplementation implements UserDao {
             }
         }
 	}
+
+
+	@Override
+	public void updateUserDetails(User user) throws SQLException {
+	    String sql = "UPDATE users SET firstName = ?, lastName = ? WHERE username = ?";
+
+	    try (Connection conn = Database.getConnection();  
+	         PreparedStatement pstmt = conn.prepareStatement(sql)) {
+	        pstmt.setString(1, user.getFirstName());
+	        pstmt.setString(2, user.getLastName());
+	        pstmt.setString(3, user.getUsername());
+
+	        pstmt.executeUpdate();  // Ensure the update is executed.
+	    } catch (SQLException e) {
+	        e.printStackTrace();
+	        throw e;  // Ensure that any SQL exception is propagated.
+	    }
+	}
+
+
+	@Override
+	public void updatePassword(User user) throws SQLException {
+	    // Correct SQL syntax for updating a user's password
+	    String sql = "UPDATE users SET password = ? WHERE username = ?";
+	    
+	    try (Connection conn = Database.getConnection();  
+	         PreparedStatement pstmt = conn.prepareStatement(sql)) {
+	        
+	        // Set the password and username values
+	        pstmt.setString(1, user.getPassword());
+	        pstmt.setString(2, user.getUsername());  // Note that it should be index 2 for username
+	        
+	        // Execute the update
+	        pstmt.executeUpdate();
+	        
+	    } catch (SQLException e) {
+	        e.printStackTrace();
+	        throw e;  // Ensure that any SQL exception is propagated.
+	    }
+	}
+
+
 }

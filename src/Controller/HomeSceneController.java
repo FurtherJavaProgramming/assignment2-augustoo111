@@ -4,12 +4,14 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import Dao.BookDao;
+import Dao.BookDaoImplementation;
 import Dao.UserDao;
 import View.CheckOutView;
 import View.LoginScene;
 import View.OrderDetailView;
 import View.updatePasswordView;
 import View.updateProfileView;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -20,6 +22,7 @@ import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
 import model.Book;
 import model.Model;
+import model.User;
 
 public class HomeSceneController {
 	
@@ -52,9 +55,15 @@ public class HomeSceneController {
     private TableColumn<Book, Integer> cartQuantityColumn;
     @FXML
     private TableColumn<Book, Double> cartPriceColumn;
+    
+    //for account tab label
+    @FXML
+    private Label accountUserNameLabel, firstNameLabel, lastNameLabel;  
+    
+
 
     @FXML
-    private TextField firstNameField, lastNameField, selectedBookField, quantityField, cartSelectedBookField, cartQuantityField;
+    private TextField selectedBookField, quantityField, cartSelectedBookField, cartQuantityField;
 
     @FXML
     private Button continueShoppingButton, checkOutButton, addCartButton, updatePasswordButton, 
@@ -71,7 +80,8 @@ public class HomeSceneController {
 	private BookDao bookDao;
 	private String username;
 	private Model model;
-    
+	private UserDao userDao;
+	private Scene homeScene;;
 
     // Default constructor
     public HomeSceneController() {}
@@ -81,16 +91,22 @@ public class HomeSceneController {
     public HomeSceneController(Stage primaryStage, Model model) {
     	this.primaryStage = primaryStage;
     }
+    
 
   // Setter method to inject the BookDao instance
     public void setBookDao(BookDao bookDao) {
         this.bookDao = bookDao;
         loadBookData();
     }
+    public BookDao getBookDao() {
+        return this.bookDao;
+    }
+
     public void setUserDao(UserDao userDao) {
-		
+    	this.userDao = userDao;
 		
 	}
+    
   // Method to set the username in the label
     public void setUsername(String username) {
         this.username = username;  // Store the username
@@ -99,21 +115,47 @@ public class HomeSceneController {
         }
     }
 
-
-    // Set the login scene to switch back after logging out
-    public void setLoginScene(Scene loginScene) {
-        this.loginScene = loginScene;
-    }
-    
-
-  
-    // Setter method for the Primary Stage
+    // Set the primary stage
     public void setPrimaryStage(Stage primaryStage) {
         this.primaryStage = primaryStage;
     }
-      // Setter method for the Model
+
+    // Set the model
     public void setModel(Model model) {
+        this.model = model;
     }
+
+    //set home scene
+    public void setHomeScene(Scene homeScene) {
+        this.homeScene = homeScene;
+        
+    }
+
+    // Log out function
+    @FXML
+    public void logOut() {
+            try {
+                // Load the login view
+                FXMLLoader loader = new FXMLLoader(getClass().getResource("/View/loginview.fxml"));
+                GridPane loginPane = loader.load();
+
+                // Get the LoginController and pass the model and primaryStage
+                LoginController loginController = loader.getController();
+                loginController.setPrimaryStage(primaryStage);
+                loginController.setModel(model); 
+
+                // Set the login scene
+                Scene loginScene = new Scene(loginPane);
+                primaryStage.setScene(loginScene);
+                primaryStage.show();
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        
+    }
+    
+
 
     private ArrayList<Book> cartItems = new ArrayList<>();
 
@@ -148,16 +190,45 @@ public class HomeSceneController {
             }
         });
      
-        // Set up buttons in the Cart tab
-        checkOutButton.setOnAction(e -> checkOut(e));
-        continueShoppingButton.setOnAction(e -> continueShopping());
-        
 		if (username != null) {
             userNameLabel.setText(username);
         }
+		if (model != null && model.getCurrentUser() != null) {
+	        User currentUser = model.getCurrentUser();
+	        
+	        // Set the username, first name, and last name in the account tab
+	        if (accountUserNameLabel != null) {
+	            accountUserNameLabel.setText(currentUser.getUsername());
+	        }
+	        if (firstNameLabel != null) {
+	        	firstNameLabel.setText(currentUser.getFirstName());
+	        }
+	        if (lastNameLabel != null) {
+	        	lastNameLabel.setText(currentUser.getLastName());
+	        }
+	    }
+		
+		tabPane.getSelectionModel().selectedItemProperty().addListener((obs, oldTab, newTab) -> {
+	        if (newTab == accountTab) {
+	            updateAccountTab();
+	        }
+	    });
+		
+		
     }
+	public void updateAccountTab() {
+	    if (model != null && model.getCurrentUser() != null) {
+	        User currentUser = model.getCurrentUser();
+	        
+	        // Set the username, first name, and last name in the account tab
+	        accountUserNameLabel.setText(currentUser.getUsername());
+	        firstNameLabel.setText(currentUser.getFirstName());
+	        lastNameLabel.setText(currentUser.getLastName());
+	    }
+	}
+
     // Method to load all books from the DAO and display in the table
-    private void loadBookData() {
+    public void loadBookData() {
         if (bookDao != null) {
             try {
                 // Fetch all books from the database
@@ -216,13 +287,10 @@ public class HomeSceneController {
             // Check if the book is already in the cart
             Book bookInCart = findBookInCart(selectedBook);
             
-            
-
             // If the book is already in the cart, reduce the available copies based on what is in the cart
             int alreadyInCart = bookInCart != null ? bookInCart.getNoOfCopies() : 0;
             int remainingCopies = availableCopies - alreadyInCart;
-      
-
+     
             // Validate the quantity (must be less than or equal to available copies if not in cart)
             if (quantity > availableCopies) {
                 showAlert(Alert.AlertType.ERROR, "Exceeds Available Stock", 
@@ -276,7 +344,7 @@ public class HomeSceneController {
     }
 
     // Helper method to find a book in the cart
-    private Book findBookInCart(Book selectedBook) {
+    public Book findBookInCart(Book selectedBook) {
         for (Book book : cartItems) {
             if (book.getTitle().equals(selectedBook.getTitle()) && book.getAuthor().equals(selectedBook.getAuthor())) {
                 return book;  // Return the book if found in the cart
@@ -284,6 +352,7 @@ public class HomeSceneController {
         }
         return null;  // Return null if the book is not in the cart
     }
+    
     
     // update quantity button
     @FXML
@@ -345,7 +414,7 @@ public class HomeSceneController {
 
 
     // Helper method to find the corresponding book in the stock table
-    private Book findBookInStock(Book selectedBook) {
+    public Book findBookInStock(Book selectedBook) {
         for (Book book : bookStockTable.getItems()) {
             if (book.getTitle().equals(selectedBook.getTitle()) && book.getAuthor().equals(selectedBook.getAuthor())) {
                 return book;
@@ -364,7 +433,6 @@ public class HomeSceneController {
             showAlert(Alert.AlertType.WARNING, "No Book Selected", "Please select a book to remove.");
             return;
         }
-
         // Remove the selected book from the cartItems list
         cartItems.remove(selectedBook);
 
@@ -378,41 +446,73 @@ public class HomeSceneController {
 
         showAlert(Alert.AlertType.INFORMATION, "Book Removed", "The book \"" + selectedBook.getTitle() + "\" has been removed from the cart.");
     }
-
-    
     
 
+ //update firstname and lastname
     @FXML
     public void updateDetails(ActionEvent e) {
-        System.out.println("Update Details clicked");
-        Stage primaryStage = (Stage) ((Button) e.getSource()).getScene().getWindow();
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/View/updateProfile.fxml"));
+            GridPane root = loader.load();
 
-        updateProfileView updateProfile = new updateProfileView(primaryStage.getScene());
-        primaryStage.setTitle(updateProfile.getTitle());
-        primaryStage.setScene(updateProfile.getScene());
+            // Get the controller for the update profile view
+            UpdateDetailsController updateDetailsController = loader.getController();
+
+            // Set the current user model and other dependencies
+            updateDetailsController.setModel(model);  // Set model for current user
+            updateDetailsController.setUserDao(userDao);  // Set DAO for database access
+
+            // Here's the key part: Pass this HomeSceneController instance to UpdateDetailsController
+            updateDetailsController.setHomeController(this); 
+
+            // Pass the current scene to allow navigating back
+            updateDetailsController.setAccountScene(primaryStage.getScene());  // Set the current account scene
+
+            // Set the new scene for the stage
+            Scene updateProfileScene = new Scene(root);
+            Stage primaryStage = (Stage) ((Button) e.getSource()).getScene().getWindow();
+            primaryStage.setScene(updateProfileScene);
+            primaryStage.show();
+        } catch (IOException ex) {
+            ex.printStackTrace();
+            showAlert(Alert.AlertType.ERROR, "Error", "Failed to load the Update Profile view.");
+        }
     }
 
+
+//update Password
     @FXML
     public void updatePassword(ActionEvent e) {
-        System.out.println("Update Password clicked");
-        Stage primaryStage = (Stage) ((Button) e.getSource()).getScene().getWindow();
+    	try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/View/updatePassword.fxml"));
+            GridPane root = loader.load();
+            // Get the controller for the update profile view
+            UpdatePasswordController updatepwd = loader.getController();
 
-        updatePasswordView updatePWView = new updatePasswordView(primaryStage.getScene());
-        primaryStage.setTitle(updatePWView.getTitle());
-        primaryStage.setScene(updatePWView.getScene());
+            // Set the current user model and other dependencies
+            updatepwd.setModel(model);  // Set model for current user
+            updatepwd.setUserDao(userDao);  // Set DAO for database access
+            // Here's the key part: Pass this HomeSceneController instance to UpdateDetailsController
+            updatepwd.setHomeController(this); 
+            // Pass the current scene to allow navigating back
+            updatepwd.setAccountScene(primaryStage.getScene());  // Set the current account scene
+
+            // Set the new scene for the stage
+            Scene updateProfileScene = new Scene(root);
+            Stage primaryStage = (Stage) ((Button) e.getSource()).getScene().getWindow();
+            primaryStage.setScene(updateProfileScene);
+            primaryStage.show();
+        } catch (IOException ex) {
+            ex.printStackTrace();
+            showAlert(Alert.AlertType.ERROR, "Error", "Failed to load the Update Profile view.");
+        }
+        
+    }
+    public void setLoginScene(Scene loginScene) {
+        this.loginScene = loginScene;
     }
 
-    @FXML
-    public void logOut() {
-        
-        Stage primaryStage = (Stage) logOutButton.getScene().getWindow();
-        
-		LoginScene loginScene = new LoginScene(model, primaryStage);
-        primaryStage.setTitle(loginScene.getTitle());
-        primaryStage.setScene(loginScene.getScene());
-       
-        
-    }
+
 
     @FXML
     public void continueShopping() {
@@ -423,27 +523,41 @@ public class HomeSceneController {
     }
 
 
- // In HomeSceneController
+  //check out method
     @FXML
     public void checkOut(ActionEvent e) {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/View/checkOutView.fxml"));
             GridPane root = loader.load();
 
+            // Get the controller associated with checkOutView.fxml
             CheckOutController checkOutController = loader.getController();
-            checkOutController.setShoppingCartScene(primaryStage.getScene());
-            checkOutController.setHomeController(this);  // Pass HomeSceneController
 
+            // Set the primary stage in the CheckOutController
+            checkOutController.setPrimaryStage(primaryStage);
+            checkOutController.setModel(model);
+
+            // Pass the HomeSceneController (this) to the CheckOutController
+            checkOutController.setHomeController(this);  // Pass the HomeSceneController
+            
+            // Pass the Home Scene
+            checkOutController.setHomeScene(primaryStage.getScene()); 
+
+            // Set the cart details (total items and total amount)
+            checkOutController.setCartDetails(calculateTotalItems(), calculateTotalAmount());
+            checkOutController.setCartItems(cartItems);
+
+            // Create and set the checkout scene
             Scene checkOutScene = new Scene(root);
-            primaryStage.setScene(checkOutScene);
+            primaryStage.setScene(checkOutScene);            
+
+
         } catch (IOException ex) {
             ex.printStackTrace();
         }
     }
+   
 
-    
-
-    
     
     // Method to calculate total amount
     private double calculateTotalAmount() {
@@ -479,14 +593,22 @@ public class HomeSceneController {
             tabPane.getSelectionModel().select(cartTab);
             
         }
+        
     }
 
     public void selectAccountTab() {
         if (tabPane != null && accountTab != null) {
             tabPane.getSelectionModel().select(accountTab);
-            System.out.println("Switched to Account tab!");
+        }
+   }
+
+
+    public void selectHomeTab() {
+        if (tabPane != null && homeTab != null) {
+            tabPane.getSelectionModel().select(homeTab);
         }
     }
+    
     // Method to show alerts for user notifications
     private void showAlert(Alert.AlertType alertType, String title, String content) {
         Alert alert = new Alert(alertType);
@@ -494,6 +616,25 @@ public class HomeSceneController {
         alert.setContentText(content);
         alert.showAndWait();
     }
+
+
+
+	// Clear cart in HomeSceneController
+	public void clearCart() {
+	    cartItems.clear();  // Clear the cart items list
+	    cartListView.getItems().clear();  // Refresh the UI by clearing the cart view
+	}
+
+	
+
+
+
+
+
+
+	
+
+
 
 
 	

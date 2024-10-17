@@ -33,8 +33,8 @@ public class LoginScene {
 
             // Get the controller and set the model and primary stage
             LoginController loginController = loader.getController();
-            loginController.setModel(model);
             loginController.setPrimaryStage(primaryStage);
+            loginController.setModel(model);
 
             // Return the scene
             return new Scene(root);

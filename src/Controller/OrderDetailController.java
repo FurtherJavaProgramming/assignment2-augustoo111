@@ -1,14 +1,23 @@
 package Controller;
 
+import java.io.IOException;
 import java.sql.SQLException;
 
-import View.HomeScene;
-import javafx.event.ActionEvent;
+import Dao.BookDao;
+import Dao.BookDaoImplementation;
+import Dao.UserDao;
+import Dao.UserDaoImplementation;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.Labeled;
+import javafx.scene.control.TabPane;
 import javafx.scene.control.TextField;
+import javafx.scene.paint.Color;
 import javafx.stage.Stage;
+import model.Model;
 
 public class OrderDetailController {
 
@@ -20,22 +29,46 @@ public class OrderDetailController {
 
     @FXML
     private TextField totalAmountField;  // Displays total amount of the order
+    
+    @FXML
+    private Button backToHomeButton;
 
     private String orderNumber;  // Unique order number (you can generate this)
     private int totalItems;      // Total items in the order
     private double totalAmount;  // Total order amount
-    private Scene accountScene;
+
     private Stage primaryStage;
     private Scene homeScene;
+    private Model model;
+    private HomeSceneController homeSceneController;
+    @FXML
+    private Label message;
+
     public void setPrimaryStage(Stage primaryStage) {
         this.primaryStage = primaryStage;
+        if (primaryStage == null) {
+            System.out.println("Warning: primaryStage is null when set in OrderDetailController!");
+        } else {
+            System.out.println("primaryStage has been set successfully in OrderDetailController.");
+        }
     }
 
-    // Set shopping cart scene
+    public void setModel(Model model) {
+        this.model = model;
+    }
+
     public void setHomeScene(Scene homeScene) {
         this.homeScene = homeScene;
+        if (homeScene == null) {
+            System.out.println("Warning: homeScene is null when set in OrderDetailController!");
+        } else {
+            System.out.println("homeScene has been set successfully in OrderDetailController.");
+        }
     }
-    
+
+    public void setHomeSceneController(HomeSceneController homeSceneController) {
+        this.homeSceneController = homeSceneController;
+    }
 
     // Method to set order details (totalItems and totalAmount)
     public void setOrderDetails(int totalItems, double totalAmount) {
@@ -56,26 +89,48 @@ public class OrderDetailController {
 
     private static int orderCounter = 1;  // Order starts from 1
 
-	 // Helper method to generate a unique order number
-	 private String generateOrderNumber() {
-	     String orderNumber = "ORD" + orderCounter;  // Create an order number with a prefix
-	     orderCounter++;  // Increment the counter for the next order
-	     return orderNumber;
-	 }
-	 
-
-
-
-    @FXML
-    public void goBackToHome(ActionEvent e) throws SQLException {
-    	Button backToHomeButton = (Button) e.getSource();
-        Stage primaryStage = (Stage) backToHomeButton.getScene().getWindow();
-		primaryStage.setScene(accountScene);
-		HomeScene homeScene = new HomeScene(backToHomeButton.getScene());
-        primaryStage.setTitle(homeScene.getTitle());
-        primaryStage.setScene(homeScene.getScene());
-        
-    	
+    // Helper method to generate a unique order number
+    private String generateOrderNumber() {
+        String orderNumber = "ORD" + orderCounter;  // Create an order number with a prefix
+        orderCounter++;  // Increment the counter for the next order
+        return orderNumber;
     }
 
+    @FXML
+    private void goBackToHome() throws SQLException {
+        try {
+            // Load FXML and controller
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/View/homeview.fxml"));
+            TabPane root = loader.load();
+
+            // Get controller instance from the FXMLLoader
+            HomeSceneController homeSceneController = loader.getController();
+
+            // Set DAOs in the controller
+            BookDao bookDao = new BookDaoImplementation();
+            homeSceneController.setBookDao(bookDao);
+
+            UserDao userDao = new UserDaoImplementation();
+            homeSceneController.setUserDao(userDao);
+
+            // Set primary stage, loginScene and username
+            homeSceneController.setPrimaryStage(primaryStage);
+            homeSceneController.setHomeScene(homeScene);
+            homeSceneController.setModel(model);  // Ensure model is passed
+            homeSceneController.setLoginScene(primaryStage.getScene());
+            homeSceneController.setUsername(model.getCurrentUser().getUsername());  // Pass the current user's username
+
+            // Set the scene
+            primaryStage.setScene(new Scene(root));
+            primaryStage.show();
+        } catch (IOException e) {
+            showErrorMessage(e.getMessage());
+        }
+    }
+
+    // Method to display error messages
+    private void showErrorMessage(String messageText) {
+		message.setText(messageText);
+        message.setTextFill(Color.RED);
+    }
 }

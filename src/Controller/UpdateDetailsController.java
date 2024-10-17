@@ -1,14 +1,17 @@
 package Controller;
 
 import java.io.IOException;
-
+import java.sql.SQLException;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
+import model.User;
+import model.Model;
+import Dao.UserDao;
 
 public class UpdateDetailsController {
 
@@ -25,61 +28,102 @@ public class UpdateDetailsController {
     private Button updateDetailsButton;
 
     @FXML
-    private Button logOutButton;
+    private Button cancelButton;
 
     @FXML
     private Button backButton;
 
-    private Scene accountScene;  // Reference to the account scene or previous scene
+    private Scene accountScene;  // Reference to the previous scene
+    private Stage primaryStage;
+    private Model model;         // The user model managing the current session
+    private UserDao userDao;      // DAO to handle user data
+    private HomeSceneController homeController;  // Reference to the HomeSceneController for updating account details
 
-    // Set the account scene to go back to after updating or canceling
+    // Setter for Model
+    public void setModel(Model model) {
+        this.model = model;
+        populateFields();  // Populate the fields with current user data when model is set
+    }
+
+    // Setter for the previous scene (account tab)
     public void setAccountScene(Scene accountScene) {
         this.accountScene = accountScene;
     }
 
+    // Setter for UserDao (database access object)
+    public void setUserDao(UserDao userDao) {
+        this.userDao = userDao;
+    }
+
+    // Setter for HomeSceneController to refresh the account tab
+    public void setHomeController(HomeSceneController homeController) {
+        this.homeController = homeController;
+    }
+
+    // Populate fields with current user details
+    private void populateFields() {
+        User currentUser = model.getCurrentUser();
+        userNameLabel.setText(currentUser.getUsername());
+        firstNameField.setText(currentUser.getFirstName());
+        lastNameField.setText(currentUser.getLastName());
+    }
+
     // Method to handle updating user details
     @FXML
-    public void updateDetails() {
+    public void updateDetails() throws SQLException {
         String firstName = firstNameField.getText();
         String lastName = lastNameField.getText();
-        System.out.println("Update Clicked");
 
         if (firstName.isEmpty() || lastName.isEmpty()) {
-            System.out.println("Please fill in both fields.");
-        } else {
-            System.out.println("Updated Details: " + firstName + " " + lastName);
-            // Add logic to update user details in the system
+            showAlert(Alert.AlertType.WARNING, "Input Error", "Please fill in both fields.");
+            return;
         }
+
+        // Get the current user from the model
+        User currentUser = model.getCurrentUser();
+        
+        // Update the user information
+        currentUser.setFirstName(firstName);
+        currentUser.setLastName(lastName);
+
+        // Update the user details in the database
+        userDao.updateUserDetails(currentUser);  // DAO call to update the user in the database
+
+        // Show success message
+        showAlert(Alert.AlertType.INFORMATION, "Update Successful", "Your details have been updated.");
+
+        // Go back to the previous scene
+        goBack();
     }
 
-    // Method to handle logging out (or canceling)
+    // Method to handle canceling (go back without saving)
     @FXML
     public void cancel() {
-        System.out.println("Canceling, going back to Account.");
-        // Clear fields or close the current window if needed
         firstNameField.clear();
         lastNameField.clear();
-        
+        goBack();
     }
 
-    // Method to handle the 'Back' button
+    // Method to handle the 'Back' button (navigate to account scene)
     @FXML
     public void goBack() {
-        System.out.println("Back to Account!");
-        Stage primaryStage = (Stage) backButton.getScene().getWindow();
-
-        // Navigate back to the account scene
-        primaryStage.setScene(accountScene);
-        primaryStage.setTitle("Account");
-
-        // If needed, reload or refresh content in the account scene
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/View/homeview.fxml"));
-            loader.load();
-            HomeSceneController homeController = loader.getController();
-            homeController.selectAccountTab();  // Assuming there's a method to select the account tab
-        } catch (IOException ex) {
-            ex.printStackTrace();
+        // Refresh the account tab details when going back
+        if (homeController != null) {
+            homeController.updateAccountTab();  // Update the account tab with new details
+        }else {
+        	System.out.print("error home controller is null");
         }
+        
+        Stage stage = (Stage) backButton.getScene().getWindow();
+        stage.setScene(accountScene);  // Set the account scene back
+        stage.show();
+    }
+
+    // Method to show alerts for user notifications
+    private void showAlert(Alert.AlertType alertType, String title, String content) {
+        Alert alert = new Alert(alertType);
+        alert.setTitle(title);
+        alert.setContentText(content);
+        alert.showAndWait();
     }
 }

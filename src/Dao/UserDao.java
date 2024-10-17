@@ -16,4 +16,6 @@ public interface UserDao {
 	User getUserByUsername(String username) throws SQLException;
 	User createUser(String firstName, String lastName, String username, String password) throws SQLException;
 	AdminUser getAdminUser(String username, String password) throws SQLException;
+	void updateUserDetails(User currentUser) throws SQLException;
+	void updatePassword(User user) throws SQLException;
 }

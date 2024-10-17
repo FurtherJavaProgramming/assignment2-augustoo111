@@ -14,7 +14,8 @@ import model.Book;
 public interface BookDao {
     void setup() throws SQLException;
     ArrayList<Book> getAllBooks() throws SQLException;
-    void updateBookStock(String title, int newStock) throws SQLException;  // Update by title
     void addBook(Book book) throws SQLException;
-    
+	void updateBookStockbyUser(Book book) throws SQLException;
+	void updateBookStock(String title, int newStock) throws SQLException;
+	
 }

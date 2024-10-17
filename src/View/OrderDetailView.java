@@ -14,6 +14,10 @@ public class OrderDetailView {
     private int totalItems;      // Number of items in the cart
     private double totalAmount;  // Total amount of the cart
     private Stage primaryStage;  // Reference to the primary stage
+    
+    public String getTitle() {
+        return "Order Details";
+    }
 
     public OrderDetailView(Scene homeScene) {
         this.homeScene = homeScene;
@@ -26,6 +30,8 @@ public class OrderDetailView {
         this.totalAmount = totalAmount;
         this.primaryStage = primaryStage;  // Pass and store the primary stage
     }
+
+
 
     // Pass totalItems and totalAmount to the OrderDetailController
     public Scene getScene() {
@@ -50,7 +56,5 @@ public class OrderDetailView {
         }
     }
 
-    public String getTitle() {
-        return "Order Details";
-    }
+    
 }

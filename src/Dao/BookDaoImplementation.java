@@ -98,5 +98,46 @@ public class BookDaoImplementation implements BookDao {
             stmt.executeUpdate();
         }
     }
+    
+    @Override
+    public void updateBookStockbyUser(Book book) throws SQLException {
+        String sql = "UPDATE books SET no_of_copies = ?, sold_copies = ? WHERE title = ?";
+        try (Connection connection = Database.getConnection(); PreparedStatement stmt = connection.prepareStatement(sql)) {
+            // Output the values being updated to verify correctness
+            System.out.println("Preparing to update database for book: " + book.getTitle());
+            System.out.println("New no_of_copies: " + book.getNoOfCopies());
+            System.out.println("New sold_copies: " + book.getSoldCopies());
+
+            // Set parameters
+            stmt.setInt(1, book.getNoOfCopies());  // Update the number of available copies
+            stmt.setInt(2, book.getSoldCopies());  // Update the number of sold copies
+            stmt.setString(3, book.getTitle());    // Find the book by title
+
+
+            // Execute the update
+            int rowsAffected = stmt.executeUpdate();
+            System.out.println("Rows affected: " + rowsAffected);
+
+            if (rowsAffected == 0) {
+                System.out.println("Error: No rows were updated. Check if the book exists.");
+            } else {
+                System.out.println("Database updated successfully for book: " + book.getTitle());
+            }
+        } catch (SQLException e) {
+            System.out.println("SQLException occurred while updating book: " + book.getTitle());
+            e.printStackTrace();
+            throw e;  // Re-throw to handle further up in the call stack
+        }
+    }
+
+
+
+
+    
+
+
+    
+
+
 
 }

@@ -36,7 +36,9 @@ public class SignUpController {
     private Stage primaryStage;  // Main application stage
 
     // Default constructor required for FXML loading
-    public SignUpController() {}
+    public SignUpController() {
+    	
+    }
 
     // Setter method for the Model
     public void setModel(Model model) {

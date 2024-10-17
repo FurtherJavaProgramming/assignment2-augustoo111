@@ -22,47 +22,87 @@ import Dao.UserDao;
 import Dao.UserDaoImplementation;
 import Dao.BookDaoImplementation;
 
+
 public class LoginController {
 
     private Stage primaryStage;
-    private Model model;  // Model class that holds the application's state and DAO reference
+    private Model model;
 
     @FXML
-    private TextField userName;  // Maps to the TextField in FXML
+    private TextField userName;
 
     @FXML
-    private PasswordField password;  // Maps to the PasswordField in FXML
+    private PasswordField password;
 
     @FXML
-    private Label message;  // Label for displaying login messages
+    private Label message;
 
     @FXML
-    private Button login;  // Login Button
+    private Button login;
 
     @FXML
-    private Button signUp;  // Sign Up Button
-    
+    private Button signUp;
+    private Scene homeScene;;
+
     public LoginController() {
     }
 
-    public LoginController(Stage stage, Model model) {
-        this.model = model;
-    }
-
-    // Add a setter method for primaryStage
     public void setPrimaryStage(Stage stage) {
         this.primaryStage = stage;
+        
     }
-    
+
     public void setModel(Model model) {
         this.model = model;
+        login.setOnAction(event -> setupLogin());
+        signUp.setOnAction(event -> loadSignUpScene());
+        
+
     }
+//    @FXML
+//    public void initialize() {
+//        // Handle login button action
+//        login.setOnAction(event -> setupLogin());
+//        // Handle sign-up button action
+//        signUp.setOnAction(event -> loadSignUpScene());
+//    }
 
+    //Method to load the home scene for regular users
+    private void loadHomeScene() throws SQLException {
+        try {
+            // Load FXML and controller
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/View/homeview.fxml"));
+            TabPane root = loader.load();
 
-    @FXML
-    public void initialize() {
-        // Handle login button action
-        login.setOnAction(event -> {
+            // Get controller instance from the FXMLLoader
+            HomeSceneController homeSceneController = loader.getController();
+
+            // Instantiate the BookDao and set it in the controller
+            BookDao bookDao = new BookDaoImplementation();  
+            homeSceneController.setBookDao(bookDao);  
+
+         // Instantiate the userDao and set it in the controller
+            UserDao userDao = new UserDaoImplementation();
+            homeSceneController.setUserDao(userDao);
+            
+            // Set primary stage, loginScene and username
+            homeSceneController.setPrimaryStage(primaryStage);
+            homeSceneController.setHomeScene(homeScene);
+            homeSceneController.setModel(model);
+            homeSceneController.setLoginScene(primaryStage.getScene());
+            homeSceneController.setUsername(model.getCurrentUser().getUsername());  // Pass the current user's username
+
+            // Set the scene
+            primaryStage.setScene(new Scene(root));
+            primaryStage.show();
+        } catch (IOException e) {
+            showErrorMessage(e.getMessage());
+        }
+    }
+    
+    // Setup method for login actions
+    public void setupLogin() {
+    	
             if (!userName.getText().isEmpty() && !password.getText().isEmpty()) {
                 try {
                     // First, try to fetch the user from the regular users table
@@ -79,6 +119,7 @@ public class LoginController {
                         }
                     } else {
                         model.setCurrentUser(user);  // Save the current user in the model
+                        
                         loadHomeScene();
                     }
                 } catch (SQLException e) {
@@ -90,43 +131,13 @@ public class LoginController {
 
             userName.clear();
             password.clear();
-        });
-
-        // Handle sign-up button action
-        signUp.setOnAction(event -> loadSignUpScene());
-    }
-
-    //Method to load the home scene for regular users
-    private void loadHomeScene() throws SQLException {
-        try {
-            // Load FXML and controller
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/View/homeview.fxml"));
-            TabPane root = loader.load();
-
-            // Get controller instance from the FXMLLoader
-            HomeSceneController homeSceneController = loader.getController();
-
-            // Instantiate the BookDao and set it in the controller
-            BookDao bookDao = new BookDaoImplementation();  
-            homeSceneController.setBookDao(bookDao);  
-         // Instantiate the userDao and set it in the controller
-            UserDao userDao = new UserDaoImplementation();
-            homeSceneController.setUserDao(userDao);
-            
-            // Set primary stage, loginScene and username
-            homeSceneController.setPrimaryStage(primaryStage);
-            homeSceneController.setLoginScene(primaryStage.getScene());
-            homeSceneController.setUsername(model.getCurrentUser().getUsername());  // Pass the current user's username
-
-            // Set the scene
-            primaryStage.setScene(new Scene(root));
-            primaryStage.show();
-        } catch (IOException e) {
-            showErrorMessage(e.getMessage());
-        }
-    }
+     }
 
 
+    
+
+    
+   
 
  // Method to load the admin dashboard scene for admins
     private void loadAdminDashboardScene() throws SQLException {
@@ -158,6 +169,7 @@ public class LoginController {
             // Handle any IO or SQL exceptions that occur during loading
             showErrorMessage("Failed to load the Admin Dashboard: " + e.getMessage());
         }
+        
     }
 
 
