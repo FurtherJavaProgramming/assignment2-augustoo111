@@ -2,10 +2,14 @@ package Controller;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
 
 import View.CheckOutView;
 import View.OrderDetailView;
+import View.ViewOrderView;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -20,9 +24,13 @@ import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
 import model.Book;
 import model.Model;
+import model.Order;
 import javafx.scene.Scene;
 import Dao.BookDao;
 import Dao.BookDaoImplementation;
+import Dao.OrderDao;
+import Dao.OrderDaoImplementation;
+import Dao.UserDao;
 
 public class CheckOutController {
 
@@ -48,8 +56,13 @@ public class CheckOutController {
 	private HomeSceneController homeSceneController;
 	private Scene homeScene;
 	private TableView<Book> bookStockTable;
+	private OrderDao orderDao;
 
 	private Model model;
+	private Order order;
+	private String username;
+
+	private UserDao userDao;
 	
     //set primary stage
     public void setPrimaryStage(Stage primaryStage) {
@@ -68,6 +81,14 @@ public class CheckOutController {
 		this.model = model;
 		
 	}
+	public void setUserDao(UserDao userDao) {
+        this.userDao = userDao;
+    }
+    
+  // Method to set the username in the label
+    public void setUsername(String username) {
+        this.username = username;  // Store the username
+    }
 
     
     // Set shopping cart scene
@@ -78,7 +99,6 @@ public class CheckOutController {
     //set Home scene
     public void setHomeScene(Scene homeScene) {
         this.homeScene = homeScene;
-        System.out.println("Home scene set in OrderDetailController: " + homeScene);  // Debugging log
     }
 
 
@@ -99,7 +119,8 @@ public class CheckOutController {
 
     @FXML
     public void initialize() throws SQLException {
-    	this.bookDao = new BookDaoImplementation();
+    	this.bookDao = new BookDaoImplementation();  
+        this.orderDao = new OrderDaoImplementation(); 
         // Populate expiry month and year choice boxes
         expiryMonthChoiceBox.getItems().addAll("01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12");
         expiryYearChoiceBox.getItems().addAll("2024", "2025", "2026", "2027", "2028", "2029", "2030");
@@ -108,23 +129,17 @@ public class CheckOutController {
 
     // Place order method
     @FXML
-    public void placeOrder() {
+    public void placeOrder() throws SQLException {
     	
         // Check if the card was already added
         if (isCardAdded) {
-        	if (cartItems.isEmpty()) {
-        	    System.out.println("Error: No items in the cart to update.");
-        	} else {
-        	    for (Book book : cartItems) {
-        	        System.out.println("Book in cart: " + book.getTitle() + ", Quantity: " + book.getNoOfCopies());
-        	    }
-        	}
-
+        	
             // If the card was added, proceed with placing the order
             showAlert(Alert.AlertType.INFORMATION, "Order Placed", "Your order has been placed successfully!");
 
             //update stock available copies
             updateBookInventory();
+            saveOrderDetails();
             // Load the Order Detail scene
             
             // Clear the cart
@@ -148,6 +163,7 @@ public class CheckOutController {
 
              // Update stock, clear cart, and load order details
                 updateBookInventory();
+                saveOrderDetails();
                 totalItem.clear();
                 totalAmount.clear();
                 clearCartItems();
@@ -160,15 +176,65 @@ public class CheckOutController {
        
         
     }
+ // Save the order details to the database
+    private void saveOrderDetails() {
+        // Check if orderDao is properly initialized
+        if (orderDao == null) {
+            showAlert(Alert.AlertType.ERROR, "ERROR!", "Unable to save the order. Please try again later.");
+            return;
+        }
 
+        // Check if cartItems is empty or null
+        if (cartItems == null || cartItems.isEmpty()) {
+            showAlert(Alert.AlertType.ERROR, "Order ERROR!", "Your cart is empty. Please add items to the cart before placing an order.");
+            return;
+        }
+
+        // Ensure the username is not null or empty
+        if (username == null || username.isEmpty()) {
+            showAlert(Alert.AlertType.ERROR, "Order ERROR!", "Unable to save the order. User is not logged in.");
+            return;
+        }
+
+        // Generate a unique Order ID
+        String orderId = generateOrderId();  
+        // Get the list of books in the cart
+        List<Book> booksInOrder = new ArrayList<>(cartItems);  
+        // Get the total amount for the order
+        double totalPrice = totalAmountValue;  
+        // Calculate the total quantity of items in the cart
+        int totalQuantity = calculateTotalItems();  
+        // Get the current date and time
+        LocalDateTime orderDate = LocalDateTime.now();  
+
+        // Create a new Order object with the above details
+        Order newOrder = new Order(orderId, booksInOrder, totalPrice, totalQuantity, orderDate);
+
+        // Try saving the order to the database
+        try {
+            // Use the newOrder object and username to save the order
+            orderDao.saveOrder(newOrder, username);  
+            showAlert(Alert.AlertType.INFORMATION, "Order Saved", "Your order has been saved successfully.");
+        } catch (SQLException e) {
+            // Handle SQL exception if saving fails
+            showAlert(Alert.AlertType.ERROR, "ERROR!", "There was an error saving your order. Please try again.");
+            e.printStackTrace();
+        }
+    }
+
+
+
+    // Method to generate a unique Order ID (could be UUID or some logic)
+    private String generateOrderId() {
+        Random random = new Random();
+        int uniqueNumber = random.nextInt(900000) + 100000;  // Generates a number between 100000 and 999999
+        return "ORD" + uniqueNumber;  // Prefix with "ORD" to make it look like an order number
+    }
 
 
     private void clearCartItems() {
         cartItems.clear();  // Clear the cart items list
         homeSceneController.clearCart();  // Clear the cart in the HomeSceneController
-
-        // Optionally show a message indicating the cart was cleared
-        System.out.println("Cart items have been cleared after placing the order.");
     }
  // In HomeSceneController
     public Book findBookInStock(Book selectedBook) {
@@ -182,23 +248,12 @@ public class CheckOutController {
 
  // Update the book stock in HomeSceneController
     private void updateBookInventory() {
-        if (bookDao == null) {
-            System.out.println("Error: bookDao is not initialized.");
-            return;
-        }
-
-        if (cartItems == null || cartItems.isEmpty()) {
-            System.out.println("Error: No items in the cart to update.");
-            return;
-        }
 
         for (Book bookInCart : cartItems) {
             // Find the corresponding book in the inventory
             Book bookInInventory = homeSceneController.findBookInStock(bookInCart);
 
             if (bookInInventory != null) {
-                System.out.println("Updating stock for book: " + bookInInventory.getTitle());
-
                 // Subtract the quantity purchased from the available stock
                 int newStock = bookInInventory.getNoOfCopies() - bookInCart.getNoOfCopies();
                 bookInInventory.setNoOfCopies(newStock);
@@ -210,27 +265,22 @@ public class CheckOutController {
                 // Update the book stock in the database
                 try {
                     bookDao.updateBookStockbyUser(bookInInventory);  // Persist changes in the database
-                    System.out.println("Stock updated in database for: " + bookInInventory.getTitle());
                 } catch (SQLException e) {
-                    System.out.println("Failed to update stock for: " + bookInInventory.getTitle());
                     e.printStackTrace();
                 }
             } else {
-                System.out.println("Book not found in inventory: " + bookInCart.getTitle());
+                showAlert(Alert.AlertType.ERROR, "ERROR!", "Book not found in inventory:" + bookInCart.getTitle());
+
             }
         }
     }
 
     public void setCartItems(ArrayList<Book> cartItems) {
         this.cartItems = cartItems;
-        // Print cart items for debugging
-        for (Book book : cartItems) {
-            System.out.println("Received cart item: " + book.getTitle() + ", Quantity: " + book.getNoOfCopies());
-        }
     }
 
     @FXML
-    public void loadOrderDetailScene() {
+    public void loadOrderDetailScene() throws SQLException {
         try {
             // Load the Order Detail FXML file
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/View/orderDetail.fxml"));
@@ -240,59 +290,57 @@ public class CheckOutController {
             OrderDetailController orderDetailController = loader.getController();
 
             // Set order details in OrderDetailController
-            orderDetailController.setOrderDetails(totalItems, totalAmountValue);
+            orderDetailController.setOrderDetails(cartItems, totalItems, totalAmountValue);
+            String orderNumber = generateOrderId();
+			orderDetailController.setOrderNumber(orderNumber);  // Pass the generated order number
+            orderDetailController.setPrimaryStage(primaryStage);  // Set primaryStage
 
             // Pass primaryStage and homeScene to OrderDetailController
             if (primaryStage != null) {
                 orderDetailController.setPrimaryStage(primaryStage);  // Set primaryStage
-                System.out.println("PrimaryStage has been passed successfully to OrderDetailController.");
-            } else {
-                System.out.println("Error: primaryStage is null when trying to set in OrderDetailController.");
             }
 
             // Pass homeScene and check if it's null
             if (homeScene != null) {
                 orderDetailController.setHomeScene(homeScene);  // Set homeScene
-                System.out.println("HomeScene has been passed successfully to OrderDetailController.");
-            } else {
-                System.out.println("Warning: homeScene is null when trying to set in OrderDetailController.");
             }
 
             // Switch to the order detail scene
             Scene orderDetailScene = new Scene(orderDetailPane);
             orderDetailController.setModel(model);
+            orderDetailController.setOrderDao(orderDao);
             primaryStage.setScene(orderDetailScene);  // Set the new scene for the primary stage
             primaryStage.show();  // Make sure the stage is displayed
 
         } catch (IOException ex) {
             ex.printStackTrace();
-            System.out.println("Error: Unable to load OrderDetailView scene.");
+            showAlert(Alert.AlertType.ERROR, "ERROR!", "Unable to load OrderDetailView scene");
+            
         }
     }
-
 
 
  // Helper method to validate the payment details
     private boolean validatePaymentDetails(String nameOnCard, String cardNumber, String expiryMonth, String expiryYear, String securityCode) {
         // Validate card number length and security code length
         if (nameOnCard.isEmpty()) {
-            showAlert(Alert.AlertType.ERROR, "Validation Error", "Name on card cannot be empty.");
+            showAlert(Alert.AlertType.ERROR, "ERROR!", "Name on card cannot be empty.");
             return false;
         }
 
         if (cardNumber.length() != 16) {
-            showAlert(Alert.AlertType.ERROR, "Validation Error", "Card number must be 16 digits.");
+            showAlert(Alert.AlertType.ERROR, "ERROR!", "Card number must be 16 digits.");
             return false;
         }
 
         if (securityCode.length() != 3) {
-            showAlert(Alert.AlertType.ERROR, "Validation Error", "Security code must be 3 digits.");
+            showAlert(Alert.AlertType.ERROR, "ERROR!", "Security code must be 3 digits.");
             return false;
         }
 
         // Ensure the expiry month and year are selected
         if (expiryMonth == null || expiryYear == null) {
-            showAlert(Alert.AlertType.ERROR, "Validation Error", "Please select a valid expiry date.");
+            showAlert(Alert.AlertType.ERROR, "ERROR!", "Please select a valid expiry date.");
             return false;
         }
 
@@ -317,7 +365,7 @@ public class CheckOutController {
             OrderDetailController orderDetailController = loader.getController();
             Stage primaryStage = (Stage) placeOrderButton.getScene().getWindow();
             // Pass totalItems and totalAmount to OrderDetailController
-            orderDetailController.setOrderDetails(totalItemsInCart, totalAmountInCart);
+            orderDetailController.setOrderDetails(cartItems, totalItemsInCart, totalAmountInCart);
 
             // Create a new scene and set it to the primary stage
             Scene orderDetailScene = new Scene(orderDetailPane);
@@ -328,7 +376,13 @@ public class CheckOutController {
             e.printStackTrace();
         }
     }
-    
+    @FXML
+    public void viewOrder(ActionEvent e) throws SQLException {
+        Stage primaryStage = (Stage) ((Button) e.getSource()).getScene().getWindow();
+        ViewOrderView viewOrder = new ViewOrderView(primaryStage.getScene());
+        primaryStage.setTitle(viewOrder.getTitle());
+        primaryStage.setScene(viewOrder.getScene());
+    }
 
     
     
@@ -351,47 +405,64 @@ public class CheckOutController {
     }
     
 
-
     // Go back to the shopping cart method
     @FXML
     public void goBackToCart() {
-        Stage primaryStage = (Stage) goBackToCartButton.getScene().getWindow();
-
-        // Load to the existing shoppingCartScene
-        primaryStage.setScene(shoppingCartScene);  // Return to the shopping cart scene
-
-        // Optional: Ensure that the cart tab is selected if required
         try {
+            // Get the current stage and switch back to the shopping cart scene
+            Stage primaryStage = (Stage) goBackToCartButton.getScene().getWindow();
+            primaryStage.setScene(shoppingCartScene);  // Return to the shopping cart scene
+            primaryStage.show();  // Make sure the stage is displayed
+
             // Assuming HomeSceneController is already set up with shoppingCartScene
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/View/homeview.fxml"));
             loader.load();
             HomeSceneController homeController = loader.getController();
-            homeController.selectShoppingCartTab();  // Switch to cart tab in the home scene
+            homeController.selectShoppingCartTab();  // Switch to the cart tab in the home scene
         } catch (IOException ex) {
             ex.printStackTrace();
+            showAlert(Alert.AlertType.ERROR, "ERROR! ", "Unable to load the HomeSceneController");
         }
     }
-    
 
 
-    // Add card method (for demo purposes)
+
+ // Add card method with payment validation
     @FXML
     public void addCard() {
-        // Show confirmation message with the last 4 digits of the card number
-        showAlert(Alert.AlertType.INFORMATION, "Card Added", "Card ending in " + 
-        cardNumberField.getText().substring(cardNumberField.getText().length() - 4) + " has been added.");
-        // Mark the card as added
-        isCardAdded = true;
-        
-        // Clear the input fields after the card has been added
+        // Get input values from fields
+        String nameOnCard = nameOnCardField.getText();
+        String cardNumber = cardNumberField.getText();
+        String expiryMonth = expiryMonthChoiceBox.getValue();
+        String expiryYear = expiryYearChoiceBox.getValue();
+        String securityCode = securityCodeField.getText();
+
+        // Validate payment details
+        if (validatePaymentDetails(nameOnCard, cardNumber, expiryMonth, expiryYear, securityCode)) {
+            // Get the last 4 digits of the card number
+            String lastFourDigits = cardNumber.substring(cardNumber.length() - 4);
+
+            // Show confirmation message with the last 4 digits of the card number
+            showAlert(Alert.AlertType.INFORMATION, "Card Added", "Card ending in " + lastFourDigits + " has been added.");
+
+
+            // Mark the card as added only if validation is successful
+            isCardAdded = true;
+
+            // Clear input fields after the card has been added
+            clearCardInputFields();
+        }
+    }
+
+    // Helper method to clear the card input fields
+    private void clearCardInputFields() {
         nameOnCardField.clear();
         cardNumberField.clear();
         securityCodeField.clear();
-        // Set the choice boxes to null (no selection)
         expiryMonthChoiceBox.setValue(null);
-        expiryYearChoiceBox.setValue(null);        
-        
+        expiryYearChoiceBox.setValue(null);
     }
+
 
 
     // Helper method to show alerts for user notifications

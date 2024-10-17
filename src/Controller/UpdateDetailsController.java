@@ -1,6 +1,5 @@
 package Controller;
 
-import java.io.IOException;
 import java.sql.SQLException;
 import javafx.fxml.FXML;
 import javafx.scene.Scene;
@@ -34,10 +33,10 @@ public class UpdateDetailsController {
     private Button backButton;
 
     private Scene accountScene;  // Reference to the previous scene
-    private Stage primaryStage;
     private Model model;         // The user model managing the current session
     private UserDao userDao;      // DAO to handle user data
     private HomeSceneController homeController;  // Reference to the HomeSceneController for updating account details
+
 
     // Setter for Model
     public void setModel(Model model) {
@@ -108,12 +107,8 @@ public class UpdateDetailsController {
     @FXML
     public void goBack() {
         // Refresh the account tab details when going back
-        if (homeController != null) {
-            homeController.updateAccountTab();  // Update the account tab with new details
-        }else {
-        	System.out.print("error home controller is null");
-        }
-        
+       homeController.updateAccountTab(); 
+
         Stage stage = (Stage) backButton.getScene().getWindow();
         stage.setScene(accountScene);  // Set the account scene back
         stage.show();

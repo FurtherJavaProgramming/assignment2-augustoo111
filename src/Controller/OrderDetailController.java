@@ -1,10 +1,17 @@
 package Controller;
 
+import java.awt.print.Book;
 import java.io.IOException;
 import java.sql.SQLException;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
 
 import Dao.BookDao;
 import Dao.BookDaoImplementation;
+import Dao.OrderDao;
+import Dao.OrderDaoImplementation;
 import Dao.UserDao;
 import Dao.UserDaoImplementation;
 import javafx.fxml.FXML;
@@ -12,115 +19,111 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.control.Labeled;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.TextField;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import model.Model;
+import model.Order;
 
 public class OrderDetailController {
-
-    @FXML
-    private TextField orderNumberField;  // Displays the order number
-
-    @FXML
-    private TextField totalItemsField;   // Displays total items in the order
-
-    @FXML
-    private TextField totalAmountField;  // Displays total amount of the order
     
+    @FXML
+    private TextField orderNumberField;
+    @FXML
+    private TextField totalItemsField;
+    @FXML
+    private TextField totalAmountField;
     @FXML
     private Button backToHomeButton;
 
-    private String orderNumber;  // Unique order number (you can generate this)
-    private int totalItems;      // Total items in the order
-    private double totalAmount;  // Total order amount
-
+    private String orderNumber;
+    private int totalItems;
+    private double totalAmount;
     private Stage primaryStage;
     private Scene homeScene;
     private Model model;
-    private HomeSceneController homeSceneController;
     @FXML
     private Label message;
+    private OrderDao orderDao;
+    private List<model.Book> booksPurchased;
+	private List<model.Book> cartItems;
+	private String orderId;
 
     public void setPrimaryStage(Stage primaryStage) {
         this.primaryStage = primaryStage;
-        if (primaryStage == null) {
-            System.out.println("Warning: primaryStage is null when set in OrderDetailController!");
-        } else {
-            System.out.println("primaryStage has been set successfully in OrderDetailController.");
-        }
     }
 
     public void setModel(Model model) {
-        this.model = model;
-    }
+    	this.model = model;
+    	}
+
+    public void setOrderNumber(String orderNumber) {
+        this.orderNumber = orderNumber;
+        updateOrderDetails();  // Update the UI
+    	}
+
+
 
     public void setHomeScene(Scene homeScene) {
         this.homeScene = homeScene;
-        if (homeScene == null) {
-            System.out.println("Warning: homeScene is null when set in OrderDetailController!");
-        } else {
-            System.out.println("homeScene has been set successfully in OrderDetailController.");
-        }
-    }
+    	}
 
-    public void setHomeSceneController(HomeSceneController homeSceneController) {
-        this.homeSceneController = homeSceneController;
-    }
+    public void setOrderDao(OrderDao orderDao) throws SQLException {
+         orderDao.setup();
+        
+    	}
 
-    // Method to set order details (totalItems and totalAmount)
-    public void setOrderDetails(int totalItems, double totalAmount) {
-        this.orderNumber = generateOrderNumber(); // Generate a dummy order number
+    public void setOrderDetails(List<model.Book> cartItem, int totalItems, double totalAmountValue) {
+        this.cartItems = cartItem;
         this.totalItems = totalItems;
-        this.totalAmount = totalAmount;
-
-        // Update the fields with order details
-        updateOrderDetails();
+        this.totalAmount = totalAmountValue;
+        // Update the UI labels with the order information
     }
 
-    // Helper method to update the order fields with provided details
+
     private void updateOrderDetails() {
-        orderNumberField.setText(orderNumber);  // Update order number
-        totalItemsField.setText(String.valueOf(totalItems));  // Update total items
-        totalAmountField.setText(String.format("%.2f AUD", totalAmount));  // Update total amount
+        // Set the order number, total items, and total amount to the UI fields
+        if (orderNumberField != null) {
+            orderNumberField.setText(orderNumber);
+        }
+
+        if (totalItemsField != null) {
+            totalItemsField.setText(String.valueOf(totalItems));
+        }
+
+        if (totalAmountField != null) {
+            totalAmountField.setText(String.format("%.2f AUD", totalAmount));
+        }
+
     }
 
-    private static int orderCounter = 1;  // Order starts from 1
-
-    // Helper method to generate a unique order number
-    private String generateOrderNumber() {
-        String orderNumber = "ORD" + orderCounter;  // Create an order number with a prefix
-        orderCounter++;  // Increment the counter for the next order
-        return orderNumber;
-    }
-
+    
+    
     @FXML
     private void goBackToHome() throws SQLException {
         try {
-            // Load FXML and controller
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/View/homeview.fxml"));
             TabPane root = loader.load();
 
-            // Get controller instance from the FXMLLoader
             HomeSceneController homeSceneController = loader.getController();
 
-            // Set DAOs in the controller
             BookDao bookDao = new BookDaoImplementation();
             homeSceneController.setBookDao(bookDao);
 
             UserDao userDao = new UserDaoImplementation();
             homeSceneController.setUserDao(userDao);
 
-            // Set primary stage, loginScene and username
+            if (orderDao == null) {
+                orderDao = new OrderDaoImplementation();
+            }
+            homeSceneController.setOrderDao(orderDao);
             homeSceneController.setPrimaryStage(primaryStage);
             homeSceneController.setHomeScene(homeScene);
-            homeSceneController.setModel(model);  // Ensure model is passed
+            homeSceneController.setModel(model);
             homeSceneController.setLoginScene(primaryStage.getScene());
-            homeSceneController.setUsername(model.getCurrentUser().getUsername());  // Pass the current user's username
+            homeSceneController.setUsername(model.getCurrentUser().getUsername());
 
-            // Set the scene
             primaryStage.setScene(new Scene(root));
             primaryStage.show();
         } catch (IOException e) {
@@ -128,9 +131,10 @@ public class OrderDetailController {
         }
     }
 
-    // Method to display error messages
     private void showErrorMessage(String messageText) {
-		message.setText(messageText);
+        message.setText(messageText);
         message.setTextFill(Color.RED);
     }
+
+	
 }

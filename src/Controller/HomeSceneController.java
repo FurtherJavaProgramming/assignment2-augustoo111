@@ -3,12 +3,17 @@ package Controller;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.List;
+
 import Dao.BookDao;
 import Dao.BookDaoImplementation;
+import Dao.OrderDao;
+import Dao.OrderDaoImplementation;
 import Dao.UserDao;
 import View.CheckOutView;
 import View.LoginScene;
 import View.OrderDetailView;
+import View.ViewOrderView;
 import View.updatePasswordView;
 import View.updateProfileView;
 import javafx.collections.ObservableList;
@@ -22,6 +27,7 @@ import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
 import model.Book;
 import model.Model;
+import model.Order;
 import model.User;
 
 public class HomeSceneController {
@@ -82,6 +88,7 @@ public class HomeSceneController {
 	private Model model;
 	private UserDao userDao;
 	private Scene homeScene;;
+	private OrderDao orderDao;
 
     // Default constructor
     public HomeSceneController() {}
@@ -114,6 +121,21 @@ public class HomeSceneController {
             userNameLabel.setText(username); // Set the username in the label
         }
     }
+
+    public void setOrderDao(OrderDao orderDao) {
+        this.orderDao = orderDao;
+
+        // Call setup to ensure tables are created
+        try {
+            this.orderDao.setup();
+        } catch (SQLException e) {
+            e.printStackTrace();
+            showAlert(Alert.AlertType.ERROR, "Database ERROR!", "Failed to initialize database tables.");
+        }
+    }
+  
+   
+
 
     // Set the primary stage
     public void setPrimaryStage(Stage primaryStage) {
@@ -155,7 +177,6 @@ public class HomeSceneController {
         
     }
     
-
 
     private ArrayList<Book> cartItems = new ArrayList<>();
 
@@ -240,14 +261,14 @@ public class HomeSceneController {
                     // Add the list of books to the TableView
                     bookStockTable.getItems().addAll(books);
                 } else {
-                    showAlert(Alert.AlertType.ERROR, "Error Loading Books", "No books found in the database.");
+                    showAlert(Alert.AlertType.ERROR, "ERROR!", "No books found in the database.");
                 }
             } catch (SQLException e) {
-                showAlert(Alert.AlertType.ERROR, "Error Loading Books", "Unable to load book data from the database.");
+                showAlert(Alert.AlertType.ERROR, "ERROR!", "Unable to load book data from the database.");
                 e.printStackTrace();
             }
         } else {
-            showAlert(Alert.AlertType.ERROR, "Error Loading Books", "BookDao is not initialized.");
+            showAlert(Alert.AlertType.ERROR, "ERROR!", "BookDao is not initialized.");
         }
     }
 
@@ -475,7 +496,7 @@ public class HomeSceneController {
             primaryStage.show();
         } catch (IOException ex) {
             ex.printStackTrace();
-            showAlert(Alert.AlertType.ERROR, "Error", "Failed to load the Update Profile view.");
+            showAlert(Alert.AlertType.ERROR, "ERROR!", "Failed to load the Update Profile view.");
         }
     }
 
@@ -504,7 +525,7 @@ public class HomeSceneController {
             primaryStage.show();
         } catch (IOException ex) {
             ex.printStackTrace();
-            showAlert(Alert.AlertType.ERROR, "Error", "Failed to load the Update Profile view.");
+            showAlert(Alert.AlertType.ERROR, "ERROR!", "Failed to load the Update Profile view.");
         }
         
     }
@@ -516,7 +537,6 @@ public class HomeSceneController {
 
     @FXML
     public void continueShopping() {
-        System.out.println("Continue shopping clicked");
         if (tabPane != null && homeTab != null) {
             tabPane.getSelectionModel().select(homeTab);
         }
@@ -542,6 +562,8 @@ public class HomeSceneController {
             
             // Pass the Home Scene
             checkOutController.setHomeScene(primaryStage.getScene()); 
+            checkOutController.setShoppingCartScene(primaryStage.getScene()); 
+            checkOutController.setUsername(username);
 
             // Set the cart details (total items and total amount)
             checkOutController.setCartDetails(calculateTotalItems(), calculateTotalAmount());
@@ -577,15 +599,40 @@ public class HomeSceneController {
         return totalQuantity;
     }
 
-
-
+    //view Order method
     @FXML
-    public void viewOrder(ActionEvent e) {
-        Stage primaryStage = (Stage) ((Button) e.getSource()).getScene().getWindow();
-        OrderDetailView viewOrder = new OrderDetailView(primaryStage.getScene());
-        primaryStage.setTitle(viewOrder.getTitle());
-        primaryStage.setScene(viewOrder.getScene());
+    public void viewOrder(ActionEvent e) throws SQLException {
+
+        try {
+            // Load the FXML file for the view orders screen
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/View/viewOrderView.fxml"));
+            Scene viewOrderScene = new Scene(loader.load());
+
+            // Get the controller instance for the new scene (ViewOrdersController)
+            ViewOrdersController viewOrdersController = loader.getController();
+
+            // Retrieve the orders from your data source (OrderDao)
+            List<Order> orders = orderDao.getAllOrders();  // Now this will get orders from the `orders` table
+            viewOrdersController.setHomeController(this);
+            viewOrdersController.setAccountScene(primaryStage.getScene());
+            // Pass the orders to the ViewOrdersController
+            viewOrdersController.loadOrders(orders);
+            viewOrdersController.setOrderDao(orderDao);
+            viewOrdersController.setUsername(model.getCurrentUser().getUsername());
+
+            // Get the current stage and set the new scene
+            Stage primaryStage = (Stage) ((Button) e.getSource()).getScene().getWindow();
+            primaryStage.setTitle("View Orders");
+            primaryStage.setScene(viewOrderScene);
+            primaryStage.show();
+
+        } catch (IOException ex) {
+            ex.printStackTrace();
+            showAlert(Alert.AlertType.ERROR, "Error", "Failed to load the View Orders screen.");
+        }
     }
+
+    
 
 
     public void selectShoppingCartTab() {
@@ -624,19 +671,5 @@ public class HomeSceneController {
 	    cartItems.clear();  // Clear the cart items list
 	    cartListView.getItems().clear();  // Refresh the UI by clearing the cart view
 	}
-
-	
-
-
-
-
-
-
-	
-
-
-
-
-	
 
 }

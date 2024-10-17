@@ -29,8 +29,10 @@ public class UserDaoImplementation implements UserDao {
 
             // SQL for creating admin user table
             String adminSql = "CREATE TABLE IF NOT EXISTS " + ADMIN_TABLE 
-                    + " (username VARCHAR(10) NOT NULL PRIMARY KEY, "
-                    + "password VARCHAR(10) NOT NULL)";
+                    + " (firstName TEXT NOT NULL, "
+                    + "lastName TEXT NOT NULL, "
+                    + "username VARCHAR(10) NOT NULL PRIMARY KEY, "
+                    + "password VARCHAR(8) NOT NULL)";
             stmt.executeUpdate(adminSql);
         }
     }

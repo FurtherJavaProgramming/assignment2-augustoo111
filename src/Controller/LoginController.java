@@ -21,6 +21,8 @@ import Dao.BookDao;
 import Dao.UserDao;
 import Dao.UserDaoImplementation;
 import Dao.BookDaoImplementation;
+import Dao.OrderDao;
+import Dao.OrderDaoImplementation;
 
 
 public class LoginController {
@@ -51,14 +53,34 @@ public class LoginController {
         this.primaryStage = stage;
         
     }
-
     public void setModel(Model model) {
         this.model = model;
+        
+        // Call the setup method for each DAO to initialize tables
+        try {
+            // Set up the database tables
+            BookDao bookDao = new BookDaoImplementation();
+            bookDao.setup();  // This will create the necessary tables for books
+            
+            UserDao userDao = new UserDaoImplementation();
+            userDao.setup();  // This will create the necessary tables for users
+            
+            OrderDao orderDao = new OrderDaoImplementation();
+            orderDao.setup();  // This will create the necessary tables for orders
+            
+            // Optionally set these DAOs in the model if needed
+            model.setUserDao(userDao);
+            model.setBookDao(bookDao);
+            model.setOrderDao(orderDao);
+            
+        } catch (SQLException e) {
+            showErrorMessage("Error setting up database: " + e.getMessage());
+        }
+        
         login.setOnAction(event -> setupLogin());
         signUp.setOnAction(event -> loadSignUpScene());
-        
-
     }
+
 //    @FXML
 //    public void initialize() {
 //        // Handle login button action
@@ -84,6 +106,9 @@ public class LoginController {
          // Instantiate the userDao and set it in the controller
             UserDao userDao = new UserDaoImplementation();
             homeSceneController.setUserDao(userDao);
+            
+            OrderDao orderDao = new OrderDaoImplementation();
+            homeSceneController.setOrderDao(orderDao);
             
             // Set primary stage, loginScene and username
             homeSceneController.setPrimaryStage(primaryStage);
@@ -156,6 +181,9 @@ public class LoginController {
             // Instantiate the userDao and set it in the controller
             UserDao userDao = new UserDaoImplementation();
             adminController.setUserDao(userDao);
+            
+            
+            
 
             // Set primary stage, loginScene and username
             adminController.setPrimaryStage(primaryStage);

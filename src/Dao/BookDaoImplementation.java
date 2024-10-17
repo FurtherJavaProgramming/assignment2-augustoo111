@@ -4,6 +4,9 @@ import model.Book;
 import java.sql.*;
 import java.util.ArrayList;
 
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
+
 public class BookDaoImplementation implements BookDao {
 
     private final String BOOK_TABLE = "books";
@@ -19,6 +22,7 @@ public class BookDaoImplementation implements BookDao {
                          "price REAL NOT NULL, " +
                          "sold_copies INTEGER NOT NULL)";
             stmt.executeUpdate(sql);
+            
         }
     }
     public BookDaoImplementation() throws SQLException {
@@ -98,45 +102,45 @@ public class BookDaoImplementation implements BookDao {
             stmt.executeUpdate();
         }
     }
-    
+
     @Override
     public void updateBookStockbyUser(Book book) throws SQLException {
         String sql = "UPDATE books SET no_of_copies = ?, sold_copies = ? WHERE title = ?";
         try (Connection connection = Database.getConnection(); PreparedStatement stmt = connection.prepareStatement(sql)) {
-            // Output the values being updated to verify correctness
-            System.out.println("Preparing to update database for book: " + book.getTitle());
-            System.out.println("New no_of_copies: " + book.getNoOfCopies());
-            System.out.println("New sold_copies: " + book.getSoldCopies());
-
             // Set parameters
             stmt.setInt(1, book.getNoOfCopies());  // Update the number of available copies
             stmt.setInt(2, book.getSoldCopies());  // Update the number of sold copies
             stmt.setString(3, book.getTitle());    // Find the book by title
 
-
             // Execute the update
             int rowsAffected = stmt.executeUpdate();
-            System.out.println("Rows affected: " + rowsAffected);
 
-            if (rowsAffected == 0) {
-                System.out.println("Error: No rows were updated. Check if the book exists.");
+            // Show success message if the update was successful
+            if (rowsAffected > 0) {
+                showMessage(AlertType.INFORMATION, "Update Successful", 
+                            "The database was updated successfully for the book: " + book.getTitle());
             } else {
-                System.out.println("Database updated successfully for book: " + book.getTitle());
+                // Show error message if no rows were affected (book not found)
+                showMessage(AlertType.WARNING, "Update Failed", 
+                            "No record found to update for the book: " + book.getTitle());
             }
         } catch (SQLException e) {
-            System.out.println("SQLException occurred while updating book: " + book.getTitle());
+            // Show an error message if an exception occurs
+            showMessage(AlertType.ERROR, "Update Error", 
+                        "An error occurred while updating the book: " + book.getTitle());
             e.printStackTrace();
             throw e;  // Re-throw to handle further up in the call stack
         }
     }
 
+    // Helper method to display messages using JavaFX Alerts
+    private void showMessage(AlertType alertType, String title, String content) {
+        Alert alert = new Alert(alertType);
+        alert.setTitle(title);
+        alert.setContentText(content);
+        alert.showAndWait();  // Show the alert and wait for user interaction
+    }
 
-
-
-    
-
-
-    
 
 
 

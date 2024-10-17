@@ -91,12 +91,11 @@ public class SignUpController {
                             	 showAlert(Alert.AlertType.ERROR, "Fail to switch Scene!", "Primary stage is not found.", "Cannot switch to login scene");
                             }
                         } else {
-                            showAlert(Alert.AlertType.ERROR, "Sign-Up Failed", "Failed to create user.",
+                            showAlert(Alert.AlertType.ERROR, "Sign-Up Failed!", "Failed to create user.",
                                       "An unknown error occurred during sign-up.");
                         }
                     } catch (SQLException e) {
-                        showAlert(Alert.AlertType.ERROR, "Sign-Up Failed", "Database error", e.getMessage());
-                        System.out.println(e.getMessage());
+                        showAlert(Alert.AlertType.ERROR, "Sign-Up Failed!", "Database error", e.getMessage());
                     }
                 } else {
                     // Password mismatch error
@@ -118,7 +117,6 @@ public class SignUpController {
         });
         
     }
-    
     
 
 
