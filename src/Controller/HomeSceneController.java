@@ -69,17 +69,17 @@ public class HomeSceneController {
     @FXML
     private Label userNameLabel, cartLabel;
     
-
-	private Stage primaryStage;  // Reference to the primary stage
+    private ArrayList<Book> cartItems = new ArrayList<>();
+	private Stage primaryStage;
 	private BookDao bookDao;
 	private String username;
 	private Model model;
 	private UserDao userDao;
 	private OrderDao orderDao;
 
-    // Default constructor
-    public HomeSceneController() {}
-
+    public HomeSceneController() {
+    	
+    }
 
     // Constructor to pass the primary stage and model
     public HomeSceneController(Stage primaryStage, Model model) {
@@ -92,6 +92,7 @@ public class HomeSceneController {
         this.bookDao = bookDao;
         loadBookData();
     }
+    
     public BookDao getBookDao() {
         return this.bookDao;
     }
@@ -101,13 +102,21 @@ public class HomeSceneController {
 		
 	}
     
-  // Method to set the username in the label
+ // Method to set the username in the label and load the cart data
     public void setUsername(String username) {
         this.username = username;  // Store the username
+
+        // Set the username in the label if the label is not null
         if (userNameLabel != null) {
-            userNameLabel.setText(username); // Set the username in the label
+            userNameLabel.setText(username);
+        }
+
+        // Load cart data if the bookDao is initialized
+        if (bookDao != null) {
+            loadCartData();  // Only load cart data if the BookDao is already set
         }
     }
+
 
     public void setOrderDao(OrderDao orderDao) {
         this.orderDao = orderDao;
@@ -130,6 +139,7 @@ public class HomeSceneController {
     // Set the model
     public void setModel(Model model) {
         this.model = model;
+        loadCartData();
     }
 
     //set home scene
@@ -140,6 +150,7 @@ public class HomeSceneController {
     // Log out function
     @FXML
     public void logOut() {
+    	saveCartItems();
             try {
                 // Load the login view
                 FXMLLoader loader = new FXMLLoader(getClass().getResource("/View/loginview.fxml"));
@@ -162,7 +173,7 @@ public class HomeSceneController {
     }
     
 
-    private ArrayList<Book> cartItems = new ArrayList<>();
+   
 
 	@FXML
     public void initialize() throws SQLException {
@@ -184,7 +195,7 @@ public class HomeSceneController {
         // Set up table columns for cartListView
         cartTitleColumn.setCellValueFactory(new PropertyValueFactory<>("title"));
         cartAuthorColumn.setCellValueFactory(new PropertyValueFactory<>("author"));
-        cartQuantityColumn.setCellValueFactory(new PropertyValueFactory<>("noOfCopies"));  // Using noOfCopies to represent quantity in the cart
+        cartQuantityColumn.setCellValueFactory(new PropertyValueFactory<>("noOfCopies")); 
         cartPriceColumn.setCellValueFactory(new PropertyValueFactory<>("totalPrice"));
 
         // Add listener to cartListView to show selected item in fields
@@ -194,6 +205,8 @@ public class HomeSceneController {
                 cartQuantityField.setText(String.valueOf(newSelection.getNoOfCopies()));
             }
         });
+        
+
      
 		if (username != null) {
             userNameLabel.setText(username);
@@ -255,37 +268,46 @@ public class HomeSceneController {
             showAlert(Alert.AlertType.ERROR, "ERROR!", "BookDao is not initialized.");
         }
     }
-    
+        
  // Load the cart items from the database for the current user
     public void loadCartData() {
-        if (bookDao != null && username != null) {
             try {
-            	ArrayList<Book> savedCartItems = bookDao.loadCartItems(username);
-                if (savedCartItems != null) {
+                ArrayList<Book> savedCartItems = bookDao.loadCartItems(username);
+                
+                if (savedCartItems != null && !savedCartItems.isEmpty()) {
                     cartItems.clear();
                     cartItems.addAll(savedCartItems);
+                    
+                    // Set the cart items into the ListView and refresh the view
                     cartListView.getItems().setAll(cartItems);
+                    cartListView.refresh();  // Refresh to ensure items are shown
+
+                } else {
+                    cartListView.getItems().clear();  // Clear the ListView if no items are found
                 }
             } catch (SQLException e) {
                 showAlert(Alert.AlertType.ERROR, "ERROR!", "Unable to load cart items from the database.");
                 e.printStackTrace();
+                System.out.println("Error while loading cart items: " + e.getMessage());  // Debugging
             }
-        }
+        
     }
 
-    // Save the cart items to the database for the current user
+//save cart items method
     public void saveCartItems() {
-        if (bookDao != null && username != null) {
             try {
+                
                 for (Book book : cartItems) {
                     bookDao.saveCartItem(username, book);  // Save each book in the cart to the database
                 }
+                
             } catch (SQLException e) {
                 showAlert(Alert.AlertType.ERROR, "ERROR!", "Unable to save cart items to the database.");
                 e.printStackTrace();
             }
-        }
     }
+    
+    
 
     
     @FXML
@@ -380,16 +402,6 @@ public class HomeSceneController {
     }
     
 
-    // Helper method to find a book in the cart
-    public Book findBookInCart(Book selectedBook) {
-        for (Book book : cartItems) {
-            if (book.getTitle().equals(selectedBook.getTitle()) && book.getAuthor().equals(selectedBook.getAuthor())) {
-                return book;  // Return the book if found in the cart
-            }
-        }
-        return null;  // Return null if the book is not in the cart
-    }
-    
     
     
     // update quantity button
@@ -473,6 +485,18 @@ public class HomeSceneController {
 
         showAlert(Alert.AlertType.INFORMATION, "Book Removed", "The book \"" + selectedBook.getTitle() + "\" has been removed from the cart.");
     }
+    
+
+    // Helper method to find a book in the cart
+    public Book findBookInCart(Book selectedBook) {
+        for (Book book : cartItems) {
+            if (book.getTitle().equals(selectedBook.getTitle()) && book.getAuthor().equals(selectedBook.getAuthor())) {
+                return book;  // Return the book if found in the cart
+            }
+        }
+        return null;  // Return null if the book is not in the cart
+    }
+    
 
 
     // Helper method to find the corresponding book in the stock table
@@ -688,6 +712,14 @@ public class HomeSceneController {
 	public void clearCart() {
 	    cartItems.clear();  // Clear the cart items list
 	    cartListView.getItems().clear();  // Refresh the UI by clearing the cart view
+	    try {
+	        if (bookDao != null && username != null) {
+	            bookDao.clearCartItems(username);  // Clear the cart in the database for the current user
+	        }
+	    } catch (SQLException e) {
+	        showAlert(Alert.AlertType.ERROR, "Error", "Failed to clear cart on logout.");
+	        e.printStackTrace();
+	    }
 	}
 
 }

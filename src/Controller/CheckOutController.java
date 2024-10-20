@@ -81,6 +81,7 @@ public class CheckOutController {
   // Method to set the username in the label
     public void setUsername(String username) {
         this.username = username;  // Store the username
+        
     }
 
     
@@ -120,30 +121,12 @@ public class CheckOutController {
         
     }
 
-    // Place order method
+     // Place order method
     @FXML
     public void placeOrder() throws SQLException {
-    	
-        // Check if the card was already added
-        if (isCardAdded) {
-        	
-            // If the card was added, proceed with placing the order
-            showAlert(Alert.AlertType.INFORMATION, "Order Placed", "Your order has been placed successfully!");
-
-            //update stock available copies
-            updateBookInventory();
-            saveOrderDetails();
-            // Load the Order Detail scene
-            
-            // Clear the cart
-            
-            totalItem.clear();
-            totalAmount.clear();
-            clearCartItems();
-            loadOrderDetailScene();
-            
-        } else {
-            // If the card has not been added, validate the payment details as usual
+        
+        // Validate payment details only if the card has not been added yet
+        if (!isCardAdded) {
             String nameOnCard = nameOnCardField.getText();
             String cardNumber = cardNumberField.getText();
             String expiryMonth = expiryMonthChoiceBox.getValue();
@@ -151,24 +134,24 @@ public class CheckOutController {
             String securityCode = securityCodeField.getText();
 
             // Validate payment details
-            if (validatePaymentDetails(nameOnCard, cardNumber, expiryMonth, expiryYear, securityCode)) {
-                showAlert(Alert.AlertType.INFORMATION, "Order Placed", "Your order has been placed successfully!");
-
-             // Update stock, clear cart, and load order details
-                updateBookInventory();
-                saveOrderDetails();
-                totalItem.clear();
-                totalAmount.clear();
-                clearCartItems();
-                loadOrderDetailScene();
-                
-            } else {
+            if (!validatePaymentDetails(nameOnCard, cardNumber, expiryMonth, expiryYear, securityCode)) {
                 showAlert(Alert.AlertType.ERROR, "Invalid Payment Details", "Please correct the payment details and try again.");
+                return;  // Exit the method if the validation fails
             }
         }
-       
-        
+
+        // If card is already added or validated, proceed with placing the order
+        showAlert(Alert.AlertType.INFORMATION, "Order Placed", "Your order has been placed successfully!");
+
+        // Update stock, clear cart, and load order details
+        updateBookInventory();
+        saveOrderDetails();
+        totalItem.clear();
+        totalAmount.clear();
+        clearCartItems();
+        loadOrderDetailScene();
     }
+
  // Save the order details to the database
     private void saveOrderDetails() {
         // Check if orderDao is properly initialized
@@ -224,11 +207,22 @@ public class CheckOutController {
         return "ORD" + uniqueNumber;  // Prefix with "ORD" to make it look like an order number
     }
 
-
     private void clearCartItems() {
-        cartItems.clear();  // Clear the cart items list
-        homeSceneController.clearCart();  // Clear the cart in the HomeSceneController
+        // Clear the in-memory cart items list
+        cartItems.clear();  
+        // Clear the cart in the HomeSceneController (UI part)
+        homeSceneController.clearCart();  
+        // Clear the cart from the database for the current user
+        try {
+            if (bookDao != null && username != null) {
+                bookDao.clearCartItems(username);  // Use the BookDao to remove cart items from the database
+            }
+        } catch (SQLException e) {
+            showAlert(Alert.AlertType.ERROR, "ERROR!", "Failed to clear cart items from the database.");
+            e.printStackTrace();
+        }
     }
+
  // In HomeSceneController
     public Book findBookInStock(Book selectedBook) {
 		for (Book book : bookStockTable.getItems()) {
@@ -336,8 +330,6 @@ public class CheckOutController {
             showAlert(Alert.AlertType.ERROR, "ERROR!", "Please select a valid expiry date.");
             return false;
         }
-
-        // If all validations pass, return true
         return true;
     }
 

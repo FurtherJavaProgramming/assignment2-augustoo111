@@ -25,6 +25,16 @@ public class BookDaoImplementation implements BookDao {
                          "sold_copies INTEGER NOT NULL)";
             stmt.executeUpdate(sql);
             
+            String createCartTable = "CREATE TABLE IF NOT EXISTS " + CART_TABLE + " (" +
+				                     "username TEXT NOT NULL, " +
+				                     "author TEXT NOT NULL, " +
+				                     "price REAL NOT NULL, " +
+				                     "book_title TEXT NOT NULL, " +
+				                     "quantity INTEGER NOT NULL, " +
+				                     "FOREIGN KEY (book_title) REFERENCES books(title), " +
+				                     "UNIQUE(username, book_title))";  // Add UNIQUE constraint
+            stmt.executeUpdate(createCartTable);
+            
         }
     }
     public BookDaoImplementation() throws SQLException {
@@ -143,10 +153,13 @@ public class BookDaoImplementation implements BookDao {
         alert.showAndWait();  // Show the alert and wait for user interaction
     }
     
+    
+    //save cart item method
     @Override
     public void saveCartItem(String username, Book book) throws SQLException {
-        String query = "INSERT INTO " + CART_TABLE + " (username, book_title, book_author, quantity, price) " +
-                       "VALUES (?, ?, ?, ?, ?) ON CONFLICT(username, book_title) DO UPDATE SET quantity = ?";
+        String query = "INSERT INTO " + CART_TABLE + " (username, book_title, author, quantity, price) " +
+                       "VALUES (?, ?, ?, ?, ?) " +
+                       "ON CONFLICT(username, book_title) DO UPDATE SET quantity = ?";
         try (Connection conn = Database.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(query)) {
             pstmt.setString(1, username);
@@ -154,14 +167,12 @@ public class BookDaoImplementation implements BookDao {
             pstmt.setString(3, book.getAuthor());
             pstmt.setInt(4, book.getNoOfCopies());
             pstmt.setDouble(5, book.getPrice());
-            pstmt.setInt(6, book.getNoOfCopies()); // Update quantity if item already exists in the cart
+            pstmt.setInt(6, book.getNoOfCopies());  // Update quantity if item already exists in the cart
             pstmt.executeUpdate();
         }
     }
-
-    @Override
     public ArrayList<Book> loadCartItems(String username) throws SQLException {
-    	ArrayList<Book> cartItems = new ArrayList<>();
+        ArrayList<Book> cartItems = new ArrayList<>();
         String query = "SELECT * FROM " + CART_TABLE + " WHERE username = ?";
         try (Connection conn = Database.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(query)) {
@@ -169,15 +180,16 @@ public class BookDaoImplementation implements BookDao {
             try (ResultSet rs = pstmt.executeQuery()) {
                 while (rs.next()) {
                     String title = rs.getString("book_title");
-                    String author = rs.getString("book_author");
+                    String author = rs.getString("author");
                     int quantity = rs.getInt("quantity");
                     double price = rs.getDouble("price");
-                    cartItems.add(new Book(title, author, quantity, price, 0));  // Assuming soldCopies = 0 for cart items
+                    cartItems.add(new Book(title, author, quantity, price, 0));
                 }
             }
         }
         return cartItems;
     }
+
 
     @Override
     public void clearCartItems(String username) throws SQLException {
