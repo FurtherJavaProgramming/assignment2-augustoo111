@@ -17,5 +17,8 @@ public interface BookDao {
     void addBook(Book book) throws SQLException;
 	void updateBookStockbyUser(Book book) throws SQLException;
 	void updateBookStock(String title, int newStock) throws SQLException;
+	void saveCartItem(String username, Book book) throws SQLException;
+	ArrayList<Book> loadCartItems(String username) throws SQLException;
+    void clearCartItems(String username) throws SQLException;
 	
 }

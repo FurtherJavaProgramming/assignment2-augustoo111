@@ -7,8 +7,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-import View.CheckOutView;
-import View.OrderDetailView;
 import View.ViewOrderView;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -17,7 +15,6 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Label;
-import javafx.scene.control.TabPane;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
@@ -59,12 +56,9 @@ public class CheckOutController {
 	private OrderDao orderDao;
 
 	private Model model;
-	private Order order;
 	private String username;
 
-	private UserDao userDao;
-	
-    //set primary stage
+	//set primary stage
     public void setPrimaryStage(Stage primaryStage) {
         this.primaryStage = primaryStage;
     }
@@ -82,7 +76,6 @@ public class CheckOutController {
 		
 	}
 	public void setUserDao(UserDao userDao) {
-        this.userDao = userDao;
     }
     
   // Method to set the username in the label

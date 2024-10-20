@@ -1,11 +1,9 @@
 package Controller;
 
-import java.io.IOException;
 import java.sql.SQLException;
 
 import Dao.UserDao;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
@@ -50,11 +48,8 @@ public class UpdatePasswordController {
     private boolean isConfirmPasswordVisible = false;
 
     private Scene accountScene; // Reference to the account scene
-    private Stage primaryStage;
     private Model model;         // The user model managing the current session
     private UserDao userDao;      // DAO to handle user data
-    private HomeSceneController homeController;  // Reference to the HomeSceneController for updating account details
-
     // Setter for Model
     public void setModel(Model model) {
         this.model = model;
@@ -69,7 +64,6 @@ public class UpdatePasswordController {
 
     // Setter for HomeSceneController to refresh the account tab
     public void setHomeController(HomeSceneController homeController) {
-        this.homeController = homeController;
     }
     private void populateFields() {
         User currentUser = model.getCurrentUser();

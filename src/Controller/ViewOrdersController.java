@@ -13,7 +13,6 @@ import javafx.stage.Stage;
 import model.Book;
 import model.Model;
 import model.Order;
-import model.User;
 
 import java.io.FileWriter;
 import java.io.IOException;
@@ -56,11 +55,7 @@ public class ViewOrdersController {
     private HomeSceneController homeController;
     private ObservableList<Order> ordersList = FXCollections.observableArrayList();  // List of orders to display
 	private OrderDao orderDao;
-	private Model model;
-	private UserDao userDao;
-	private String username;
-
-    // Set the account scene to go back to
+	// Set the account scene to go back to
     public void setAccountScene(Scene accountScene) {
         this.accountScene = accountScene;
     }
@@ -70,20 +65,17 @@ public class ViewOrdersController {
     }
     
     public void setModel(Model model) throws SQLException {
-        this.model = model;
-    	orderDao.setup();
+        orderDao.setup();
     	
     }
     public void setOrderDao(OrderDao orderDao) {
         this.orderDao = orderDao;
     }
     public void setUserDao(UserDao userDao) {
-        this.userDao = userDao;
     }
     
   // Method to set the username in the label
     public void setUsername(String username) {
-        this.username = username;  // Store the username
         if (accountUserNameLabel != null) {
         	accountUserNameLabel.setText(username); // Set the username in the label
         }

@@ -6,17 +6,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import Dao.BookDao;
-import Dao.BookDaoImplementation;
 import Dao.OrderDao;
-import Dao.OrderDaoImplementation;
 import Dao.UserDao;
-import View.CheckOutView;
-import View.LoginScene;
-import View.OrderDetailView;
-import View.ViewOrderView;
-import View.updatePasswordView;
-import View.updateProfileView;
-import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -79,15 +70,11 @@ public class HomeSceneController {
     private Label userNameLabel, cartLabel;
     
 
-    
-
-	private Scene loginScene;  // Reference to the login scene
 	private Stage primaryStage;  // Reference to the primary stage
 	private BookDao bookDao;
 	private String username;
 	private Model model;
 	private UserDao userDao;
-	private Scene homeScene;;
 	private OrderDao orderDao;
 
     // Default constructor
@@ -134,8 +121,6 @@ public class HomeSceneController {
         }
     }
   
-   
-
 
     // Set the primary stage
     public void setPrimaryStage(Stage primaryStage) {
@@ -149,7 +134,6 @@ public class HomeSceneController {
 
     //set home scene
     public void setHomeScene(Scene homeScene) {
-        this.homeScene = homeScene;
         
     }
 
@@ -271,6 +255,37 @@ public class HomeSceneController {
             showAlert(Alert.AlertType.ERROR, "ERROR!", "BookDao is not initialized.");
         }
     }
+    
+ // Load the cart items from the database for the current user
+    public void loadCartData() {
+        if (bookDao != null && username != null) {
+            try {
+            	ArrayList<Book> savedCartItems = bookDao.loadCartItems(username);
+                if (savedCartItems != null) {
+                    cartItems.clear();
+                    cartItems.addAll(savedCartItems);
+                    cartListView.getItems().setAll(cartItems);
+                }
+            } catch (SQLException e) {
+                showAlert(Alert.AlertType.ERROR, "ERROR!", "Unable to load cart items from the database.");
+                e.printStackTrace();
+            }
+        }
+    }
+
+    // Save the cart items to the database for the current user
+    public void saveCartItems() {
+        if (bookDao != null && username != null) {
+            try {
+                for (Book book : cartItems) {
+                    bookDao.saveCartItem(username, book);  // Save each book in the cart to the database
+                }
+            } catch (SQLException e) {
+                showAlert(Alert.AlertType.ERROR, "ERROR!", "Unable to save cart items to the database.");
+                e.printStackTrace();
+            }
+        }
+    }
 
     
     @FXML
@@ -363,6 +378,7 @@ public class HomeSceneController {
             showAlert(Alert.AlertType.ERROR, "Invalid Quantity", "Please enter a valid number for the quantity.");
         }
     }
+    
 
     // Helper method to find a book in the cart
     public Book findBookInCart(Book selectedBook) {
@@ -373,6 +389,7 @@ public class HomeSceneController {
         }
         return null;  // Return null if the book is not in the cart
     }
+    
     
     
     // update quantity button
@@ -432,18 +449,7 @@ public class HomeSceneController {
             showAlert(Alert.AlertType.ERROR, "Invalid Quantity", "Please enter a valid number for the quantity.");
         }
     }
-
-
-    // Helper method to find the corresponding book in the stock table
-    public Book findBookInStock(Book selectedBook) {
-        for (Book book : bookStockTable.getItems()) {
-            if (book.getTitle().equals(selectedBook.getTitle()) && book.getAuthor().equals(selectedBook.getAuthor())) {
-                return book;
-            }
-        }
-        return null;
-    }
-    
+    //remove book from cart method
     @FXML
     public void removeBookFromCart() {
         // Get the selected book from the cartListView
@@ -467,6 +473,19 @@ public class HomeSceneController {
 
         showAlert(Alert.AlertType.INFORMATION, "Book Removed", "The book \"" + selectedBook.getTitle() + "\" has been removed from the cart.");
     }
+
+
+    // Helper method to find the corresponding book in the stock table
+    public Book findBookInStock(Book selectedBook) {
+        for (Book book : bookStockTable.getItems()) {
+            if (book.getTitle().equals(selectedBook.getTitle()) && book.getAuthor().equals(selectedBook.getAuthor())) {
+                return book;
+            }
+        }
+        return null;
+    }
+    
+
     
 
  //update firstname and lastname
@@ -530,7 +549,6 @@ public class HomeSceneController {
         
     }
     public void setLoginScene(Scene loginScene) {
-        this.loginScene = loginScene;
     }
 
 

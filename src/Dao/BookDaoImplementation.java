@@ -10,6 +10,8 @@ import javafx.scene.control.Alert.AlertType;
 public class BookDaoImplementation implements BookDao {
 
     private final String BOOK_TABLE = "books";
+    private final String CART_TABLE = "cart";
+
     ArrayList<Book> books = new ArrayList<>();
 
     @Override
@@ -139,6 +141,52 @@ public class BookDaoImplementation implements BookDao {
         alert.setTitle(title);
         alert.setContentText(content);
         alert.showAndWait();  // Show the alert and wait for user interaction
+    }
+    
+    @Override
+    public void saveCartItem(String username, Book book) throws SQLException {
+        String query = "INSERT INTO " + CART_TABLE + " (username, book_title, book_author, quantity, price) " +
+                       "VALUES (?, ?, ?, ?, ?) ON CONFLICT(username, book_title) DO UPDATE SET quantity = ?";
+        try (Connection conn = Database.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(query)) {
+            pstmt.setString(1, username);
+            pstmt.setString(2, book.getTitle());
+            pstmt.setString(3, book.getAuthor());
+            pstmt.setInt(4, book.getNoOfCopies());
+            pstmt.setDouble(5, book.getPrice());
+            pstmt.setInt(6, book.getNoOfCopies()); // Update quantity if item already exists in the cart
+            pstmt.executeUpdate();
+        }
+    }
+
+    @Override
+    public ArrayList<Book> loadCartItems(String username) throws SQLException {
+    	ArrayList<Book> cartItems = new ArrayList<>();
+        String query = "SELECT * FROM " + CART_TABLE + " WHERE username = ?";
+        try (Connection conn = Database.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(query)) {
+            pstmt.setString(1, username);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                while (rs.next()) {
+                    String title = rs.getString("book_title");
+                    String author = rs.getString("book_author");
+                    int quantity = rs.getInt("quantity");
+                    double price = rs.getDouble("price");
+                    cartItems.add(new Book(title, author, quantity, price, 0));  // Assuming soldCopies = 0 for cart items
+                }
+            }
+        }
+        return cartItems;
+    }
+
+    @Override
+    public void clearCartItems(String username) throws SQLException {
+        String query = "DELETE FROM " + CART_TABLE + " WHERE username = ?";
+        try (Connection conn = Database.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(query)) {
+            pstmt.setString(1, username);
+            pstmt.executeUpdate();
+        }
     }
 
 

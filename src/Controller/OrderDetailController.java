@@ -1,13 +1,8 @@
 package Controller;
 
-import java.awt.print.Book;
 import java.io.IOException;
 import java.sql.SQLException;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
-
 import Dao.BookDao;
 import Dao.BookDaoImplementation;
 import Dao.OrderDao;
@@ -24,7 +19,6 @@ import javafx.scene.control.TextField;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import model.Model;
-import model.Order;
 
 public class OrderDetailController {
     
@@ -46,10 +40,7 @@ public class OrderDetailController {
     @FXML
     private Label message;
     private OrderDao orderDao;
-    private List<model.Book> booksPurchased;
-	private List<model.Book> cartItems;
-	private String orderId;
-
+    
     public void setPrimaryStage(Stage primaryStage) {
         this.primaryStage = primaryStage;
     }
@@ -75,7 +66,6 @@ public class OrderDetailController {
     	}
 
     public void setOrderDetails(List<model.Book> cartItem, int totalItems, double totalAmountValue) {
-        this.cartItems = cartItem;
         this.totalItems = totalItems;
         this.totalAmount = totalAmountValue;
         // Update the UI labels with the order information
