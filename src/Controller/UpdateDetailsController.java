@@ -107,7 +107,7 @@ public class UpdateDetailsController {
     @FXML
     public void goBack() {
         // Refresh the account tab details when going back
-       homeController.updateAccountTab(); 
+        homeController.updateAccountTab(); 
         Stage stage = (Stage) backButton.getScene().getWindow();
         stage.setScene(accountScene);  // Set the account scene back
         stage.show();

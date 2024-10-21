@@ -28,7 +28,7 @@ public class SignUpController {
     private TextField confirmPasswordField;
 
     @FXML
-    private Button signUpButton;  // Button for sign-up
+    private Button signUpButton, goBackButton;  // Buttons for sign-up and going back
 
     private Scene loginScene;
     private Model model;  // Reference to the model for interaction with DAO
@@ -37,7 +37,6 @@ public class SignUpController {
 
     // Default constructor required for FXML loading
     public SignUpController() {
-    	
     }
 
     // Setter method for the Model
@@ -58,67 +57,86 @@ public class SignUpController {
     @FXML
     public void initialize() {
         // Handle sign-up button action
-        signUpButton.setOnAction(event -> {
-            if (!firstNameField.getText().isEmpty() && !lastNameField.getText().isEmpty() &&
-                !userNameField.getText().isEmpty() && !passwordField.getText().isEmpty() &&
-                !confirmPasswordField.getText().isEmpty()) {
+        signUpButton.setOnAction(event -> signUp());
+        goBackButton.setOnAction(event -> goBack());
+    }
 
-                if (passwordField.getText().equals(confirmPasswordField.getText())) {
-                    try {
-                        // Check if the username already exists
-                        User existingUser = model.getUserDao().getUserByUsername(userNameField.getText());
-                        if (existingUser != null) {
-                            // Username already exists
-                            showAlert(Alert.AlertType.WARNING, "Username Already Exists",
-                                      "The username is already taken.",
-                                      "Please choose another username.");
-                            return;  // Exit the method early
-                        }
+    // Method for handling user sign-up
+    private void signUp() {
+        // Trim user input to avoid accidental spaces
+        String firstName = firstNameField.getText().trim();
+        String lastName = lastNameField.getText().trim();
+        String username = userNameField.getText().trim();
+        String password = passwordField.getText();
+        String confirmPassword = confirmPasswordField.getText();
 
-                        // If the username is not taken, proceed to create a new user
-                        User newUser = model.getUserDao().createUser(
-                            firstNameField.getText(), lastNameField.getText(),
-                            userNameField.getText(), passwordField.getText());
+        if (!firstName.isEmpty() && !lastName.isEmpty() &&
+            !username.isEmpty() && !password.isEmpty() &&
+            !confirmPassword.isEmpty()) {
 
-                        if (newUser != null) {
-                            // Success message
-                            showAlert(Alert.AlertType.INFORMATION, "Sign-Up Success",
-                                      "Sign-up successful!",
-                                      "User " + newUser.getUsername() + " has been created.");
-                            if (primaryStage != null) {
-                                primaryStage.setScene(loginScene);  // Switch to login scene
-                            } else {
-                            	 showAlert(Alert.AlertType.ERROR, "Fail to switch Scene!", "Primary stage is not found.", "Cannot switch to login scene");
-                            }
-                        } else {
-                            showAlert(Alert.AlertType.ERROR, "Sign-Up Failed!", "Failed to create user.",
-                                      "An unknown error occurred during sign-up.");
-                        }
-                    } catch (SQLException e) {
-                        showAlert(Alert.AlertType.ERROR, "Sign-Up Failed!", "Database error", e.getMessage());
+            if (password.equals(confirmPassword)) {
+                try {
+                    // Check if the model is set
+                    if (model == null || model.getUserDao() == null) {
+                        showAlert(Alert.AlertType.ERROR, "Error", "System Error", "Model or DAO is not initialized.");
+                        return;
                     }
-                } else {
-                    // Password mismatch error
-                    showAlert(Alert.AlertType.WARNING, "Password Mismatch",
-                              "Passwords do not match", "Please ensure that both passwords match.");
+
+                    // Check if the username already exists
+                    User existingUser = model.getUserDao().getUserByUsername(username);
+                    if (existingUser != null) {
+                        // Username already exists
+                        showAlert(Alert.AlertType.WARNING, "Username Already Exists",
+                                  "The username is already taken.",
+                                  "Please choose another username.");
+                        return;  // Exit the method early
+                    }
+
+                    // If the username is not taken, proceed to create a new user
+                    User newUser = model.getUserDao().createUser(firstName, lastName, username, password);
+
+                    if (newUser != null) {
+                        // Success message
+                        showAlert(Alert.AlertType.INFORMATION, "Sign-Up Success",
+                                  "Sign-up successful!",
+                                  "User " + newUser.getUsername() + " has been created.");
+                        if (primaryStage != null) {
+                            primaryStage.setScene(loginScene);  // Switch to login scene
+                        } else {
+                            showAlert(Alert.AlertType.ERROR, "Scene Error", "Primary stage not found", "Cannot switch to login scene.");
+                        }
+                        // Clear fields after successful sign-up
+                        clearFields();
+                    } else {
+                        showAlert(Alert.AlertType.ERROR, "Sign-Up Failed", "Failed to create user", "An unknown error occurred during sign-up.");
+                    }
+                } catch (SQLException e) {
+                    showAlert(Alert.AlertType.ERROR, "Sign-Up Failed", "Database error", e.getMessage());
                 }
             } else {
-                // Empty field error
-                showAlert(Alert.AlertType.WARNING, "Empty Fields",
-                          "All fields must be filled.", "Please fill all fields before signing up.");
+                // Password mismatch error
+                showAlert(Alert.AlertType.WARNING, "Password Mismatch", "Passwords do not match", "Please ensure that both passwords match.");
             }
-
-            // Clear fields after submission
-            firstNameField.clear();
-            lastNameField.clear();
-            userNameField.clear();
-            passwordField.clear();
-            confirmPasswordField.clear();
-        });
-        
+        } else {
+            // Empty field error
+            showAlert(Alert.AlertType.WARNING, "Empty Fields", "All fields must be filled.", "Please fill all fields before signing up.");
+        }
     }
-    
 
+    // Method to handle going back to login scene
+    private void goBack() {
+    	Stage primaryStage = (Stage) goBackButton.getScene().getWindow();
+        primaryStage.setScene(loginScene);
+    }
+
+    // Method to clear all input fields
+    private void clearFields() {
+        firstNameField.clear();
+        lastNameField.clear();
+        userNameField.clear();
+        passwordField.clear();
+        confirmPasswordField.clear();
+    }
 
     // Method to show alert messages
     private void showAlert(Alert.AlertType alertType, String title, String header, String content) {
