@@ -12,7 +12,7 @@
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.text.Text?>
 
-<TabPane fx:id="tabPane" prefHeight="600" prefWidth="800" tabClosingPolicy="UNAVAILABLE" xmlns="http://javafx.com/javafx/22" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Controller.AdminDashboardController">
+<TabPane fx:id="tabPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600" prefWidth="900.0" tabClosingPolicy="UNAVAILABLE" xmlns="http://javafx.com/javafx/22" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Controller.AdminDashboardController">
     <tabs>
 
         <!-- Admin Dashboard Tab -->
@@ -25,10 +25,10 @@
 
                 <!-- Row Constraints -->
                 <rowConstraints>
-                    <RowConstraints minHeight="50.0" vgrow="SOMETIMES" />
-                    <RowConstraints minHeight="50.0" vgrow="SOMETIMES" />
-                    <RowConstraints minHeight="50.0" vgrow="SOMETIMES" />
-                    <RowConstraints minHeight="50.0" vgrow="SOMETIMES" />
+                    <RowConstraints maxHeight="44.40003204345703" minHeight="43.600013732910156" prefHeight="43.600013732910156" vgrow="SOMETIMES" />
+                    <RowConstraints maxHeight="45.5999755859375" minHeight="19.99999237060547" prefHeight="36.19998626708984" vgrow="SOMETIMES" />
+                    <RowConstraints maxHeight="49.20000762939452" minHeight="18.800018310546875" prefHeight="38.40001983642577" vgrow="SOMETIMES" />
+                    <RowConstraints maxHeight="244.19998168945312" minHeight="50.0" prefHeight="244.19998168945312" vgrow="SOMETIMES" />
                     <RowConstraints />
                     <RowConstraints />
                 </rowConstraints>

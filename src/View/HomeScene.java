@@ -44,16 +44,14 @@ public class HomeScene {
             homeController.setUsername(username); 
             
             // Set necessary references in the controller
-            homeController.setLoginScene(loginScene);  // Set login scene for logout functionality
-            homeController.setPrimaryStage(primaryStage);  // Set the primary stage for scene switching
-            // **Set the Model in the controller**
-            homeController.setModel(model);  // Pass the model instance to the controller
-            
-            homeController.selectShoppingCartTab(); //set shoppingcart tab for scene switching
-            homeController.selectHomeTab(); //set Home Tab
-            homeController.selectAccountTab(); //selecet account tab
+            homeController.setLoginScene(loginScene);
+            homeController.setPrimaryStage(primaryStage);
+            homeController.setModel(model);
+            homeController.selectShoppingCartTab();
+            homeController.selectHomeTab();
+            homeController.selectAccountTab();
 
-            return new Scene(root);  // Return the scene
+            return new Scene(root);
         } catch (IOException e) {
             e.printStackTrace();
             return null;

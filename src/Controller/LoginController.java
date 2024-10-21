@@ -201,7 +201,6 @@ public class LoginController {
     }
 
 
-
     // Method to load the sign-up scene
     private void loadSignUpScene() {
         try {
@@ -231,4 +230,5 @@ public class LoginController {
         message.setText(messageText);
         message.setTextFill(Color.RED);
     }
+
 }

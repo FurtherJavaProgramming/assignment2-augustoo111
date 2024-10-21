@@ -139,7 +139,6 @@ public class UpdatePasswordController {
     public void goBack() {
         Stage primaryStage = (Stage) goBackButton.getScene().getWindow();
         primaryStage.setScene(accountScene);
-        primaryStage.setTitle("Account");
     }
 
     // Method to handle the cancel button

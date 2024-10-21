@@ -11,7 +11,7 @@
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
 
-<GridPane alignment="CENTER" hgap="20" prefHeight="600" prefWidth="800" style="-fx-padding: 20;" vgap="20" xmlns="http://javafx.com/javafx/22" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Controller.CheckOutController">
+<GridPane alignment="CENTER" hgap="20" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600" prefWidth="900.0" style="-fx-padding: 20;" vgap="20" xmlns="http://javafx.com/javafx/22" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Controller.CheckOutController">
 
                       <!-- Title of the Checkout Page -->
     <Label style="-fx-font-size: 24px; -fx-font-weight: bold;" text="Checkout" textFill="#117bd6" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.rowIndex="0" />

@@ -57,8 +57,6 @@ public class HomeSceneController {
     @FXML
     private Label accountUserNameLabel, firstNameLabel, lastNameLabel;  
     
-
-
     @FXML
     private TextField selectedBookField, quantityField, cartSelectedBookField, cartQuantityField;
 
@@ -144,7 +142,7 @@ public class HomeSceneController {
 
     //set home scene
     public void setHomeScene(Scene homeScene) {
-        
+    	
     }
 
     // Log out function
@@ -667,7 +665,6 @@ public class HomeSceneController {
 
             // Get the current stage and set the new scene
             Stage primaryStage = (Stage) ((Button) e.getSource()).getScene().getWindow();
-            primaryStage.setTitle("View Orders");
             primaryStage.setScene(viewOrderScene);
             primaryStage.show();
 
