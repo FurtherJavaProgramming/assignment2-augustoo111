@@ -91,8 +91,8 @@ public class ViewOrdersController {
             // Call the method to get orders for the given username
             List<Order> userOrders = orderDao.getOrdersByUsername(username);
 
-            // Display the orders in the TableView or however you'd like to display them
-            ordersTableView.getItems().setAll(userOrders);  // Assuming TableView is used for displaying orders
+            // Display the orders in the TableView
+            ordersTableView.getItems().setAll(userOrders);
         } catch (SQLException e) {
             e.printStackTrace();
             // Handle the exception (e.g., show an error message to the user)
@@ -110,14 +110,12 @@ public class ViewOrdersController {
         stage.show();
     }
 
-    // Load orders into the TableView
+    // Load orders method with sorted by recent order
     public void loadOrders(List<Order> orders) {
         ordersList.clear();
         ordersList.addAll(orders);
-
         // Sort orders by date (most recent first)
         ordersList.sort((o1, o2) -> o2.getOrderDateTime().compareTo(o1.getOrderDateTime()));
-
         ordersTableView.setItems(ordersList);
     }
 
@@ -128,7 +126,7 @@ public class ViewOrdersController {
         orderIdColumn.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getOrderId()));
 
         dateColumn.setCellValueFactory(cellData -> new SimpleStringProperty(
-                cellData.getValue().getOrderDateTime().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
+                cellData.getValue().getOrderDateTime().format(DateTimeFormatter.ofPattern("yyyy-MM-dd - HH:mm:ss"))
         ));
 
         totalPriceColumn.setCellValueFactory(cellData -> new SimpleStringProperty(

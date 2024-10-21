@@ -5,8 +5,7 @@ import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
-
+import java.util.UUID;
 import View.ViewOrderView;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -199,12 +198,11 @@ public class CheckOutController {
     }
 
 
-
-    // Method to generate a unique Order ID (could be UUID or some logic)
+    // Method to generate a unique Order ID
     private String generateOrderId() {
-        Random random = new Random();
-        int uniqueNumber = random.nextInt(900000) + 100000;  // Generates a number between 100000 and 999999
-        return "ORD" + uniqueNumber;  // Prefix with "ORD" to make it look like an order number
+        UUID uuid = UUID.randomUUID();
+        String orderID = uuid.toString().substring(0, 8);//to take the only first 8 string
+        return "ORD" + orderID;  // Prefix with "ORD"
     }
 
     private void clearCartItems() {
