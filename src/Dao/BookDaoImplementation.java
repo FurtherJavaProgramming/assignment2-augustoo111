@@ -3,9 +3,15 @@ package Dao;
 import model.Book;
 import java.sql.*;
 import java.util.ArrayList;
-
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
+/**
+ * The BookDaoImplementation class provides implementations for the BookDao interface,
+ * managing all database operations related to books and the shopping cart.
+ * 
+ * This class connects to the database using the {@link Database} class and interacts
+ * with the SQLite database using SQL queries.
+ */
 
 public class BookDaoImplementation implements BookDao {
 
@@ -41,7 +47,6 @@ public class BookDaoImplementation implements BookDao {
         setup();  // Ensure the setup method is called in the constructor
         addInitialBooks();
     }
-
     
     public void addInitialBooks() throws SQLException {
         // Creating an ArrayList for the book list
@@ -89,9 +94,7 @@ public class BookDaoImplementation implements BookDao {
         return books;
     }
     
-
-
-
+    // update instock for admin
     @Override
     public void updateBookStock(String title, int newStock) throws SQLException {
         String sql = "UPDATE " + BOOK_TABLE + " SET no_of_copies = ? WHERE title = ?";
@@ -101,7 +104,8 @@ public class BookDaoImplementation implements BookDao {
             stmt.executeUpdate();
         }
     }
-
+    
+    // add book method
     @Override
     public void addBook(Book book) throws SQLException {
         String sql = "INSERT OR IGNORE INTO " + BOOK_TABLE + " (title, author, no_of_copies, price, sold_copies) VALUES (?, ?, ?, ?, ?)";
@@ -114,7 +118,7 @@ public class BookDaoImplementation implements BookDao {
             stmt.executeUpdate();
         }
     }
-
+    //update instock and sold copies after user placed an order
     @Override
     public void updateBookStockbyUser(Book book) throws SQLException {
         String sql = "UPDATE books SET no_of_copies = ?, sold_copies = ? WHERE title = ?";
@@ -171,6 +175,9 @@ public class BookDaoImplementation implements BookDao {
             pstmt.executeUpdate();
         }
     }
+    
+    //load cart items
+    @Override
     public ArrayList<Book> loadCartItems(String username) throws SQLException {
         ArrayList<Book> cartItems = new ArrayList<>();
         String query = "SELECT * FROM " + CART_TABLE + " WHERE username = ?";

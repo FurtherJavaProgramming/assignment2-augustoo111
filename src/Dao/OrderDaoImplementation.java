@@ -7,12 +7,19 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
-
+/**
+ * The `OrderDaoImplementation` class provides the concrete implementation 
+ * of the `OrderDao` interface, handling CRUD operations for orders in a 
+ * SQLite database.
+ * 
+ * This class manages the creation of the orders table, and allows retrieval, 
+ * insertion, and fetching of order details by interacting with the underlying 
+ * database.
+ **/
 public class OrderDaoImplementation implements OrderDao {
 
     private final String ORDERS_TABLE = "orders";
-
-    
+    //set up databse method
     @Override
     public void setup() throws SQLException {
         try (Connection connection = Database.getConnection();
@@ -29,8 +36,7 @@ public class OrderDaoImplementation implements OrderDao {
             stmt.executeUpdate(createOrdersTable);
         }
     }
-
-
+    //get all order method
     @Override
     public List<Order> getAllOrders() throws SQLException {
         List<Order> orders = new ArrayList<>();
@@ -70,23 +76,7 @@ public class OrderDaoImplementation implements OrderDao {
         return orders;
     }
 
-    private List<Book> parseBooksFromString(String booksPurchased, int totalQuantity) {
-        List<Book> books = new ArrayList<>();
-        if (booksPurchased != null && !booksPurchased.isEmpty()) {
-            String[] bookTitles = booksPurchased.split(", ");
-            
-            // Calculate the quantity for each book (evenly distributed)
-            int quantityPerBook = totalQuantity / bookTitles.length;
-
-            for (String title : bookTitles) {
-                // Create a new Book object with title and quantity
-                books.add(new Book(title, quantityPerBook, 0.0));  // Assuming 0.0 as price for simplicity
-            }
-        }
-        return books;
-    }
-
-    
+    //save order method
     @Override
     public void saveOrder(Order order, String username) throws SQLException {
         String query = "INSERT INTO " + ORDERS_TABLE + " (order_id, order_date_time, total_price, total_quantity, books_purchased, username) VALUES (?, ?, ?, ?, ?, ?)";
@@ -113,38 +103,13 @@ public class OrderDaoImplementation implements OrderDao {
                     .collect(Collectors.joining(", "));
             preparedStatement.setString(5, booksPurchased);
 
-            // Set the username (ensure this is the correct username of the logged-in user)
-            preparedStatement.setString(6, username);  // Store the username
+            preparedStatement.setString(6, username); 
 
-            // Execute the query
             preparedStatement.executeUpdate();
         }
     }
-
-
-    @Override
-    public Order getOrderById(String orderId) throws SQLException {
-        String query = "SELECT * FROM " + ORDERS_TABLE + " WHERE order_id = ?";
-
-        try (Connection conn = Database.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(query)) {
-
-            stmt.setString(1, orderId);
-            try (ResultSet resultSet = stmt.executeQuery()) {
-                if (resultSet.next()) {
-                    LocalDateTime orderDateTime = resultSet.getTimestamp("order_date_time").toLocalDateTime();
-                    double totalPrice = resultSet.getDouble("total_price");
-                    int totalQuantity = resultSet.getInt("total_quantity");
-
-                    String booksPurchased = resultSet.getString("books_purchased");
-                    List<Book> books = parseBooksFromString(booksPurchased, totalQuantity);
-
-                    return new Order(orderId, books, totalPrice, totalQuantity, orderDateTime);
-                }
-            }
-        }
-        return null;
-    }
+    
+    //get order by username method
     @Override
     public List<Order> getOrdersByUsername(String username) throws SQLException {
         List<Order> orders = new ArrayList<>();
@@ -174,8 +139,24 @@ public class OrderDaoImplementation implements OrderDao {
         }
         return orders;
     }
+    //store books as comma-separated titles in the database
+    private List<Book> parseBooksFromString(String booksPurchased, int totalQuantity) {
+        List<Book> books = new ArrayList<>();
+        if (booksPurchased != null && !booksPurchased.isEmpty()) {
+            String[] bookTitles = booksPurchased.split(", ");
+            
+            // Calculate the quantity for each book (evenly distributed)
+            int quantityPerBook = totalQuantity / bookTitles.length;
 
+            for (String title : bookTitles) {
+                // Create a new Book object with title and quantity
+                books.add(new Book(title, quantityPerBook, 0.0));  // Assuming 0.0 as price for simplicity
+            }
+        }
+        return books;
+    }
 
+     //insert order method
     @Override
     public void insertOrder(Order order) throws SQLException {
         String sqlOrder = "INSERT INTO " + ORDERS_TABLE + " (order_id, order_date_time, total_price, total_quantity, books_purchased) VALUES (?, ?, ?, ?, ?)";

@@ -234,6 +234,8 @@ public class HomeSceneController {
 		
 		
     }
+	
+	//update account tab after user update user detail
 	public void updateAccountTab() {
 	    if (model != null && model.getCurrentUser() != null) {
 	        User currentUser = model.getCurrentUser();
@@ -269,7 +271,7 @@ public class HomeSceneController {
         }
     }
         
- // Load the cart items from the database for the current user
+    // Load the cart items from the database for the current user
     public void loadCartData() {
             try {
                 ArrayList<Book> savedCartItems = bookDao.loadCartItems(username);
@@ -317,7 +319,7 @@ public class HomeSceneController {
         Book selectedBook = bookStockTable.getSelectionModel().getSelectedItem();
         String chooseItem = selectedBookField.getText();
         String quantityText = quantityField.getText();
-
+        
         // Check if a book is selected
         if (chooseItem == null || chooseItem.isEmpty()) {
             showAlert(Alert.AlertType.WARNING, "No Book Selected", "Please select a book to add to the cart.");
@@ -329,6 +331,7 @@ public class HomeSceneController {
             showAlert(Alert.AlertType.WARNING, "No Quantity Entered", "Please enter the quantity.");
             return;
         }
+        
 
         try {
             // Parse the quantity entered by the user
