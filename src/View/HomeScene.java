@@ -2,7 +2,6 @@ package View;
 
 import java.io.IOException;
 import java.sql.SQLException;
-
 import Controller.HomeSceneController;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
@@ -25,13 +24,8 @@ public class HomeScene {
         this.username = username;  // Store the username
     }
 
-    // Title for the user dashboard
-    public String getTitle() {
-        return "Reading Room Book Store";
-    }
-
-    // Load the home scene
-    public Scene getScene() throws SQLException {
+    // Method to set the scene and update the title dynamically
+    public void setScene() throws SQLException {
         FXMLLoader loader = new FXMLLoader(getClass().getResource("homeview.fxml"));
 
         try {
@@ -39,22 +33,29 @@ public class HomeScene {
 
             // Get the controller from the FXML loader
             HomeSceneController homeController = loader.getController();
-
-            // Pass the username to the controller
-            homeController.setUsername(username); 
             
             // Set necessary references in the controller
+            homeController.setUsername(username); 
             homeController.setLoginScene(loginScene);
             homeController.setPrimaryStage(primaryStage);
             homeController.setModel(model);
+
+            // Optionally select default tabs (if necessary)
             homeController.selectShoppingCartTab();
             homeController.selectHomeTab();
             homeController.selectAccountTab();
 
-            return new Scene(root);
+            // Create the scene for the home view
+            Scene homeScene = new Scene(root);
+
+            // Set the new scene on the primary stage
+            primaryStage.setScene(homeScene);
+            // Show the updated stage with the new scene and title
+            primaryStage.show();
         } catch (IOException e) {
+            // Handle IOException with a meaningful error message
+            System.err.println("Error loading homeview.fxml: " + e.getMessage());
             e.printStackTrace();
-            return null;
         }
     }
 }

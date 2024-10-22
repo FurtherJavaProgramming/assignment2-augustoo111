@@ -45,6 +45,7 @@ public class OrderDetailView {
             OrderDetailController controller = loader.getController();
             // Set the shopping cart scene in the controller
             controller.setHomeScene(homeScene);
+            primaryStage.setTitle(getTitle());
             
             // Set the primary stage in the controller
             controller.setPrimaryStage(primaryStage);

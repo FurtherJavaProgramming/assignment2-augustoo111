@@ -93,7 +93,7 @@ public class OrderDaoImplementation implements OrderDao {
             preparedStatement.setString(1, order.getOrderId());
 
             // Store LocalDateTime as a Timestamp in the database
-            String formattedDateTime = order.getOrderDateTime().format(DateTimeFormatter.ofPattern("yyyy-MM-dd / HH:mm:ss"));
+            String formattedDateTime = order.getOrderDateTime().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
             preparedStatement.setString(2, formattedDateTime);
 
 

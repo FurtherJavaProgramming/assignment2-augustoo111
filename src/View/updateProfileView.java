@@ -6,10 +6,12 @@ import Controller.UpdateDetailsController;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.layout.GridPane;
+import javafx.stage.Stage;
 
 public class updateProfileView {
 
 	private Scene myAccount;  // Scene to navigate back to login
+	private Stage primaryStage;
     
     public updateProfileView(Scene myAccount) {
     	this.myAccount = myAccount;
@@ -26,6 +28,7 @@ public class updateProfileView {
             GridPane root = loader.load();
             UpdateDetailsController controller = loader.getController();
             controller.setAccountScene(myAccount);
+            primaryStage.setTitle(getTitle());
             return new Scene(root);
             } catch (IOException e) {
             	e.printStackTrace();

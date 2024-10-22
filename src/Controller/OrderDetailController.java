@@ -41,8 +41,14 @@ public class OrderDetailController {
     private Label message;
     private OrderDao orderDao;
     
+    public String getTitle() {
+        return "Order Detail";
+    }
+
+    
     public void setPrimaryStage(Stage primaryStage) {
         this.primaryStage = primaryStage;
+        primaryStage.setTitle(getTitle());
     }
 
     public void setModel(Model model) {

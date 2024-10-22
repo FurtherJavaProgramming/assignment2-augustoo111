@@ -14,9 +14,6 @@ public class ViewOrderView {
         this.myAccount = myAccount;
     }
 
-    public String getTitle() {
-        return "View Order Detail";
-    }
 
     public Scene getScene() {
         FXMLLoader loader = new FXMLLoader(getClass().getResource("viewOrderview.fxml"));

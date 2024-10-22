@@ -50,10 +50,20 @@ public class UpdatePasswordController {
     private Scene accountScene; // Reference to the account scene
     private Model model;         // The user model managing the current session
     private UserDao userDao;      // DAO to handle user data
+    public String getTitle() {
+        return "Update Password";
+    }
+ 
+ // Setter method for the Primary Stage
+    public void setPrimaryStage(Stage primaryStage) {
+        primaryStage.setTitle(getTitle());
+    }
+
     // Setter for Model
     public void setModel(Model model) {
         this.model = model;
         populateFields();
+        getTitle();
     }
 
     // Setter for UserDao (database access object)

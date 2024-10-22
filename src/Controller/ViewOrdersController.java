@@ -55,6 +55,15 @@ public class ViewOrdersController {
     private HomeSceneController homeController;
     private ObservableList<Order> ordersList = FXCollections.observableArrayList();  // List of orders to display
 	private OrderDao orderDao;
+    public String getTitle() {
+        return "Order History";
+    }
+
+ // Setter method for the Primary Stage
+    public void setPrimaryStage(Stage primaryStage) {
+        primaryStage.setTitle(getTitle());
+    }
+
 	// Set the account scene to go back to
     public void setAccountScene(Scene accountScene) {
         this.accountScene = accountScene;
@@ -66,6 +75,7 @@ public class ViewOrdersController {
     
     public void setModel(Model model) throws SQLException {
         orderDao.setup();
+        getTitle();
     	
     }
     public void setOrderDao(OrderDao orderDao) {

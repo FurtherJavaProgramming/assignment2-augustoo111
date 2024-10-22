@@ -1,6 +1,7 @@
 package Controller;
 
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
@@ -9,9 +10,12 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
 import model.Book;
+import model.Model;
 
+import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import Dao.BookDao;
@@ -39,10 +43,10 @@ public class AdminDashboardController {
     private Button logOutButton, updateStockButton;  // Buttons
     
 
-    private Scene loginScene;  // Reference to the login scene
     private Stage primaryStage;  // Reference to the primary stage
     private BookDao bookDao;
     private String username;
+    private Model model;
 
 
  // Setter method to inject the BookDao instance
@@ -50,15 +54,17 @@ public class AdminDashboardController {
         this.bookDao = bookDao;
         loadBookData();
     }
-    
-    // Set the login scene to switch back after logging out
-    public void setLoginScene(Scene loginScene) {
-        this.loginScene = loginScene;
+    public void setModel(Model model) {
+        this.model = model;
     }
-    
+    public String getTitle() {
+    	return "Admin Dashboard";
+    }
+
     // Setter method for the Primary Stage
     public void setPrimaryStage(Stage primaryStage) {
         this.primaryStage = primaryStage;
+        primaryStage.setTitle(getTitle());
     }
     
     public void setUserDao(UserDao userDao) {
@@ -128,15 +134,28 @@ public class AdminDashboardController {
     // Method to handle logout and switch back to the login scene
     @FXML
     public void logOut() {
-        if (loginScene != null) {
-            // Log out the user, switch back to the login scene
-            primaryStage.setScene(loginScene);
-            primaryStage.show();  // Make sure the stage is shown
-        } else {
-            // If the login scene is not set, show an alert
-            showAlert(Alert.AlertType.WARNING, "Logout Failed", "Unable to log out. The login scene is not set.");
-        }
+            try {
+                // Load the login view
+                FXMLLoader loader = new FXMLLoader(getClass().getResource("/View/loginview.fxml"));
+                GridPane loginPane = loader.load();
+
+                // Get the LoginController and pass the model and primaryStage
+                LoginController loginController = loader.getController();
+                loginController.setPrimaryStage(primaryStage);
+                loginController.setModel(model); 
+
+                // Set the login scene
+                Scene loginScene = new Scene(loginPane);
+                primaryStage.setScene(loginScene);
+                primaryStage.show();
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        
     }
+    
+
     
     @FXML
     public void updateStock() {

@@ -56,10 +56,15 @@ public class CheckOutController {
 
 	private Model model;
 	private String username;
+	 public String getTitle() {
+	    	return "Check Out";
+	    }
+
 
 	//set primary stage
     public void setPrimaryStage(Stage primaryStage) {
         this.primaryStage = primaryStage;
+        primaryStage.setTitle(getTitle());
     }
     
     public void setBookDao(BookDao bookDao) {
@@ -363,7 +368,6 @@ public class CheckOutController {
     public void viewOrder(ActionEvent e) throws SQLException {
         Stage primaryStage = (Stage) ((Button) e.getSource()).getScene().getWindow();
         ViewOrderView viewOrder = new ViewOrderView(primaryStage.getScene());
-        primaryStage.setTitle(viewOrder.getTitle());
         primaryStage.setScene(viewOrder.getScene());
     }
 

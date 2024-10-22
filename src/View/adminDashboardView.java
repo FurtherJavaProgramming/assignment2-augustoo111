@@ -9,42 +9,38 @@ import javafx.stage.Stage;
 
 public class adminDashboardView {
 
-    private Scene loginScene;
     private Stage primaryStage;  // Reference to the main stage for scene switching
     private String username;
 
     // Constructor to initialize with login scene, model, and stage
     public adminDashboardView(Scene loginScene, Stage primaryStage, String username) {
-        this.loginScene = loginScene;
         this.primaryStage = primaryStage;
         this.username = username;
     }
 
-    // Title for the admin dashboard
-    public String getTitle() {
-        return "Reading Room Book Store Admin";
-    }
-
     // Load the admin dashboard scene
-    public Scene getScene() {
-    	FXMLLoader loader = new FXMLLoader(getClass().getResource("admindashboardview.fxml"));
+    public void setScene() {
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("admindashboardview.fxml"));
 
         try {
             TabPane root = loader.load();
 
             // Get the controller from the FXML loader
             AdminDashboardController controller = loader.getController();
-            // Pass the username to the controller
-            controller.setUsername(username); 
+            controller.setUsername(username);
+            controller.setPrimaryStage(primaryStage);  
 
-            // Set necessary references in the controller
-            controller.setLoginScene(loginScene);  // Set login scene for logout functionality
-            controller.setPrimaryStage(primaryStage);  // Set the primary stage for scene switching
+            // Create a new Scene for the admin dashboard
+            Scene scene = new Scene(root);
+            // Set the new scene on the primary stage
+            primaryStage.setScene(scene);
+            // Set the title for the admin dashboard
+            primaryStage.setTitle("Admin Dashboard");
 
-            return new Scene(root);  // Return the scene
+            // Show the stage with the updated scene and title
+            primaryStage.show();
         } catch (IOException e) {
             e.printStackTrace();
-            return null;
         }
     }
 }

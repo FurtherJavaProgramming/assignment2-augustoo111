@@ -37,6 +37,14 @@ public class UpdateDetailsController {
     private UserDao userDao;      // DAO to handle user data
     private HomeSceneController homeController;  // Reference to the HomeSceneController for updating account details
 
+	public String getTitle() {
+    	return "Update Detail";
+    }
+ // Setter method for the Primary Stage
+    public void setPrimaryStage(Stage primaryStage) {
+        primaryStage.setTitle(getTitle());
+    }
+
 
     // Setter for Model
     public void setModel(Model model) {

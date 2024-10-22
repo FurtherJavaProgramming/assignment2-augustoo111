@@ -1,7 +1,6 @@
 package View;
 
 import java.io.IOException;
-
 import Controller.CheckOutController;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
@@ -28,11 +27,8 @@ public class CheckOutView {
         this.model = model;                // Initialize model
     }
 
-    public String getTitle() {
-        return "Check Out";
-    }
-
-    public Scene getScene() {
+    // Set the scene and update the title
+    public void setScene() {
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/View/checkOutView.fxml"));
 
         try {
@@ -44,7 +40,7 @@ public class CheckOutView {
             
             // Set the primary stage in the controller
             controller.setPrimaryStage(primaryStage);
-
+            
             // Set the model in the controller
             controller.setModel(model);
             
@@ -58,10 +54,15 @@ public class CheckOutView {
             // Pass the totalItems and totalAmount to the controller
             controller.setCartDetails(totalItems, totalAmount);
             
-            return new Scene(root);
+            // Create the scene
+            Scene checkOutScene = new Scene(root);
+            
+            // Set the new scene on the primary stage
+            primaryStage.setScene(checkOutScene);
+            // Show the updated stage with the new scene and title
+            primaryStage.show();
         } catch (IOException e) {
             e.printStackTrace();
-            return null;
         }
     }
 }

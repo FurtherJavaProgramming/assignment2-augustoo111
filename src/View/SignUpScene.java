@@ -32,6 +32,7 @@ public class SignUpScene {
 
         try {
             GridPane root = loader.load();
+            primaryStage.setTitle(getTitle());
             
             // Get the controller and set the required fields
             SignUpController controller = loader.getController();

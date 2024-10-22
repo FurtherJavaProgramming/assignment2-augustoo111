@@ -47,9 +47,14 @@ public class LoginController {
 
     public LoginController() {
     }
+ // Method to get the title of the login scene
+    public String getTitle() {
+        return "Log In";
+    }
 
     public void setPrimaryStage(Stage stage) {
         this.primaryStage = stage;
+        primaryStage.setTitle(getTitle());
         
     }
     public void setModel(Model model) {
@@ -79,14 +84,6 @@ public class LoginController {
         login.setOnAction(event -> setupLogin());
         signUp.setOnAction(event -> loadSignUpScene());
     }
-
-//    @FXML
-//    public void initialize() {
-//        // Handle login button action
-//        login.setOnAction(event -> setupLogin());
-//        // Handle sign-up button action
-//        signUp.setOnAction(event -> loadSignUpScene());
-//    }
 
     //Method to load the home scene for regular users
     private void loadHomeScene() throws SQLException {
@@ -158,11 +155,6 @@ public class LoginController {
      }
 
 
-    
-
-    
-   
-
  // Method to load the admin dashboard scene for admins
     private void loadAdminDashboardScene() throws SQLException {
         try {
@@ -180,13 +172,10 @@ public class LoginController {
             // Instantiate the userDao and set it in the controller
             UserDao userDao = new UserDaoImplementation();
             adminController.setUserDao(userDao);
-            
-            
-            
 
             // Set primary stage, loginScene and username
             adminController.setPrimaryStage(primaryStage);
-            adminController.setLoginScene(primaryStage.getScene());
+            adminController.setModel(model);
             adminController.setUsername(model.getCurrentUser().getUsername());
 
             // Create and set the scene

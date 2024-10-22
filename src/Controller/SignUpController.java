@@ -38,6 +38,10 @@ public class SignUpController {
     // Default constructor required for FXML loading
     public SignUpController() {
     }
+    public String getTitle() {
+        return "Sign Up";
+    }
+
 
     // Setter method for the Model
     public void setModel(Model model) {
@@ -47,6 +51,7 @@ public class SignUpController {
     // Setter method for the Primary Stage
     public void setPrimaryStage(Stage primaryStage) {
         this.primaryStage = primaryStage;
+        primaryStage.setTitle(getTitle());
     }
 
     // Set the login scene to switch back after successful sign-up

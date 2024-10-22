@@ -77,6 +77,11 @@ public class HomeSceneController {
     public HomeSceneController() {
     	
     }
+    
+    public String getTitle() {
+        return "Reading Room Book Store";
+    }
+
 
     // Constructor to pass the primary stage and model
     public HomeSceneController(Stage primaryStage, Model model) {
@@ -131,6 +136,7 @@ public class HomeSceneController {
     // Set the primary stage
     public void setPrimaryStage(Stage primaryStage) {
         this.primaryStage = primaryStage;
+        primaryStage.setTitle(getTitle());
     }
 
     // Set the model
@@ -523,11 +529,11 @@ public class HomeSceneController {
             UpdateDetailsController updateDetailsController = loader.getController();
 
             // Set the current user model and other dependencies
-            updateDetailsController.setModel(model);  // Set model for current user
-            updateDetailsController.setUserDao(userDao);  // Set DAO for database access
-
-            // Here's the key part: Pass this HomeSceneController instance to UpdateDetailsController
+            updateDetailsController.setModel(model); 
+            updateDetailsController.setUserDao(userDao); 
             updateDetailsController.setHomeController(this); 
+            updateDetailsController.setPrimaryStage(primaryStage);
+
 
             // Pass the current scene to allow navigating back
             updateDetailsController.setAccountScene(primaryStage.getScene());  // Set the current account scene
@@ -536,6 +542,7 @@ public class HomeSceneController {
             Scene updateProfileScene = new Scene(root);
             Stage primaryStage = (Stage) ((Button) e.getSource()).getScene().getWindow();
             primaryStage.setScene(updateProfileScene);
+            primaryStage.getTitle();
             primaryStage.show();
         } catch (IOException ex) {
             ex.printStackTrace();
@@ -560,11 +567,13 @@ public class HomeSceneController {
             updatepwd.setHomeController(this); 
             // Pass the current scene to allow navigating back
             updatepwd.setAccountScene(primaryStage.getScene());  // Set the current account scene
+            updatepwd.setPrimaryStage(primaryStage);
 
             // Set the new scene for the stage
             Scene updateProfileScene = new Scene(root);
             Stage primaryStage = (Stage) ((Button) e.getSource()).getScene().getWindow();
             primaryStage.setScene(updateProfileScene);
+            primaryStage.getTitle();
             primaryStage.show();
         } catch (IOException ex) {
             ex.printStackTrace();
@@ -611,6 +620,8 @@ public class HomeSceneController {
             checkOutController.setHomeScene(primaryStage.getScene()); 
             checkOutController.setShoppingCartScene(primaryStage.getScene()); 
             checkOutController.setUsername(username);
+            checkOutController.setPrimaryStage(primaryStage);
+            
 
             // Set the cart details (total items and total amount)
             checkOutController.setCartDetails(calculateTotalItems(), calculateTotalAmount());
@@ -666,10 +677,12 @@ public class HomeSceneController {
             viewOrdersController.loadOrders(orders);
             viewOrdersController.setOrderDao(orderDao);
             viewOrdersController.setUsername(model.getCurrentUser().getUsername());
+            viewOrdersController.setPrimaryStage(primaryStage);
 
             // Get the current stage and set the new scene
             Stage primaryStage = (Stage) ((Button) e.getSource()).getScene().getWindow();
             primaryStage.setScene(viewOrderScene);
+            
             primaryStage.show();
 
         } catch (IOException ex) {
