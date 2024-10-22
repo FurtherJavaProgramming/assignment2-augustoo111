@@ -56,7 +56,7 @@ public class SignUpController {
 
     @FXML
     public void initialize() {
-        // Handle sign-up button action
+        // Handle sign-up and go back button action
         signUpButton.setOnAction(event -> signUp());
         goBackButton.setOnAction(event -> goBack());
     }

@@ -22,7 +22,6 @@ import model.Order;
 import model.User;
 
 public class HomeSceneController {
-	
 
     @FXML
     private TabPane tabPane;
@@ -589,6 +588,11 @@ public class HomeSceneController {
   //check out method
     @FXML
     public void checkOut(ActionEvent e) {
+    	// Check if the cart is empty before proceeding to checkout
+        if (cartItems == null || cartItems.isEmpty()) {
+            showAlert(Alert.AlertType.WARNING, "Empty Cart", "Your cart is empty. Please add items to the cart before checking out.");
+            return;  // Stop the checkout process if the cart is empty
+        }
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/View/checkOutView.fxml"));
             GridPane root = loader.load();

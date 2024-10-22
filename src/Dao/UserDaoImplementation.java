@@ -5,9 +5,14 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-
 import model.AdminUser;
 import model.User;
+
+/**
+ * This class provides an implementation of the UserDao interface.
+ * It manages user and admin user data using a database for storage.
+ * It handles method including creating, reading, updating, and authenticating users.
+ */
 
 public class UserDaoImplementation implements UserDao {
     private final String USER_TABLE = "users";
