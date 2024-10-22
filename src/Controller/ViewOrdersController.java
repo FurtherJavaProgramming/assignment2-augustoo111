@@ -126,7 +126,7 @@ public class ViewOrdersController {
         orderIdColumn.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getOrderId()));
 
         dateColumn.setCellValueFactory(cellData -> new SimpleStringProperty(
-                cellData.getValue().getOrderDateTime().format(DateTimeFormatter.ofPattern("yyyy-MM-dd - HH:mm:ss"))
+                cellData.getValue().getOrderDateTime().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
         ));
 
         totalPriceColumn.setCellValueFactory(cellData -> new SimpleStringProperty(

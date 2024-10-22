@@ -4,9 +4,11 @@ import model.Order;
 import model.Book;
 import java.sql.*;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+
 /**
  * The `OrderDaoImplementation` class provides the concrete implementation 
  * of the `OrderDao` interface, handling CRUD operations for orders in a 
@@ -19,7 +21,8 @@ import java.util.stream.Collectors;
 public class OrderDaoImplementation implements OrderDao {
 
     private final String ORDERS_TABLE = "orders";
-    //set up databse method
+
+    // Set up database method
     @Override
     public void setup() throws SQLException {
         try (Connection connection = Database.getConnection();
@@ -28,15 +31,16 @@ public class OrderDaoImplementation implements OrderDao {
             // Create orders table if it doesn't exist
             String createOrdersTable = "CREATE TABLE IF NOT EXISTS " + ORDERS_TABLE + " (" +
                                        "order_id TEXT PRIMARY KEY, " +
-                                       "order_date_time TIMESTAMP NOT NULL, " +
-                                       "username TEXT NOT NULL, " +  // Add username column
+                                       "order_date_time DATETIME NOT NULL, " +
+                                       "username TEXT NOT NULL, " +  
                                        "total_price DOUBLE NOT NULL, " +
                                        "total_quantity INT NOT NULL, " +
                                        "books_purchased TEXT)";
             stmt.executeUpdate(createOrdersTable);
         }
     }
-    //get all order method
+
+    // Get all orders method
     @Override
     public List<Order> getAllOrders() throws SQLException {
         List<Order> orders = new ArrayList<>();
@@ -48,22 +52,23 @@ public class OrderDaoImplementation implements OrderDao {
 
             while (rs.next()) {
                 String orderId = rs.getString("order_id");
-                LocalDateTime orderDateTime = rs.getTimestamp("order_date_time").toLocalDateTime();
+
+                // Get order date-time as a string and manually parse it
+                String orderDateTimeStr = rs.getString("order_date_time");
+                LocalDateTime orderDateTime = LocalDateTime.parse(orderDateTimeStr, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+
                 double totalPrice = rs.getDouble("total_price");
                 int totalQuantity = rs.getInt("total_quantity");  // Get total quantity
 
                 // Fetch associated books as a string and split into an array of titles
                 String booksPurchased = rs.getString("books_purchased");
                 List<Book> books = new ArrayList<>();
-                
+
                 if (booksPurchased != null && !booksPurchased.isEmpty()) {
                     String[] bookTitles = booksPurchased.split(", ");
-                    
-                    // Calculate the quantity for each book (evenly distributed)
                     int quantityPerBook = totalQuantity / bookTitles.length;
 
                     for (String title : bookTitles) {
-                        // Create Book objects with title and quantity for each book
                         books.add(new Book(title, quantityPerBook, 0.0));  // Assuming price is 0.0 for simplicity
                     }
                 }
@@ -76,7 +81,7 @@ public class OrderDaoImplementation implements OrderDao {
         return orders;
     }
 
-    //save order method
+    // Save order method
     @Override
     public void saveOrder(Order order, String username) throws SQLException {
         String query = "INSERT INTO " + ORDERS_TABLE + " (order_id, order_date_time, total_price, total_quantity, books_purchased, username) VALUES (?, ?, ?, ?, ?, ?)";
@@ -86,8 +91,12 @@ public class OrderDaoImplementation implements OrderDao {
 
             // Set order ID
             preparedStatement.setString(1, order.getOrderId());
-            // Set order date and time
-            preparedStatement.setTimestamp(2, Timestamp.valueOf(order.getOrderDateTime()));  // Convert LocalDateTime to SQL Timestamp
+
+            // Store LocalDateTime as a Timestamp in the database
+            String formattedDateTime = order.getOrderDateTime().format(DateTimeFormatter.ofPattern("yyyy-MM-dd / HH:mm:ss"));
+            preparedStatement.setString(2, formattedDateTime);
+
+
             // Set total price
             preparedStatement.setDouble(3, order.getTotalPrice());
 
@@ -103,13 +112,14 @@ public class OrderDaoImplementation implements OrderDao {
                     .collect(Collectors.joining(", "));
             preparedStatement.setString(5, booksPurchased);
 
-            preparedStatement.setString(6, username); 
+            // Set the username
+            preparedStatement.setString(6, username);
 
             preparedStatement.executeUpdate();
         }
     }
-    
-    //get order by username method
+
+    // Get order by username method
     @Override
     public List<Order> getOrdersByUsername(String username) throws SQLException {
         List<Order> orders = new ArrayList<>();
@@ -123,7 +133,11 @@ public class OrderDaoImplementation implements OrderDao {
 
                 while (rs.next()) {
                     String orderId = rs.getString("order_id");
-                    LocalDateTime orderDateTime = rs.getTimestamp("order_date_time").toLocalDateTime();
+
+                    // Retrieve the date from the database as a Timestamp
+                    String orderDateTimeStr = rs.getString("order_date_time");
+                    LocalDateTime orderDateTime = LocalDateTime.parse(orderDateTimeStr, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+
                     double totalPrice = rs.getDouble("total_price");
                     int totalQuantity = rs.getInt("total_quantity");
 
@@ -139,12 +153,14 @@ public class OrderDaoImplementation implements OrderDao {
         }
         return orders;
     }
-    //store books as comma-separated titles in the database
+    
+
+    // Parse books from a comma-separated string
     private List<Book> parseBooksFromString(String booksPurchased, int totalQuantity) {
         List<Book> books = new ArrayList<>();
         if (booksPurchased != null && !booksPurchased.isEmpty()) {
             String[] bookTitles = booksPurchased.split(", ");
-            
+
             // Calculate the quantity for each book (evenly distributed)
             int quantityPerBook = totalQuantity / bookTitles.length;
 
@@ -154,41 +170,6 @@ public class OrderDaoImplementation implements OrderDao {
             }
         }
         return books;
-    }
-
-     //insert order method
-    @Override
-    public void insertOrder(Order order) throws SQLException {
-        String sqlOrder = "INSERT INTO " + ORDERS_TABLE + " (order_id, order_date_time, total_price, total_quantity, books_purchased) VALUES (?, ?, ?, ?, ?)";
-
-        try (Connection connection = Database.getConnection();
-             PreparedStatement stmtOrder = connection.prepareStatement(sqlOrder)) {
-
-            // Step 1: Insert the order into the orders table
-            stmtOrder.setString(1, order.getOrderId());
-            stmtOrder.setTimestamp(2, Timestamp.valueOf(order.getOrderDateTime()));
-            stmtOrder.setDouble(3, order.getTotalPrice());
-
-            // Calculate total quantity of books in the order
-            int totalQuantity = order.getBooks().stream()
-                                     .mapToInt(Book::getNoOfCopies)
-                                     .sum();
-            stmtOrder.setInt(4, totalQuantity);
-
-            // Convert the list of books to a comma-separated string
-            String booksPurchasedTitles = order.getBooks().stream()
-                                               .map(Book::getTitle)
-                                               .collect(Collectors.joining(", "));
-            stmtOrder.setString(5, booksPurchasedTitles);  // Store book titles as a string in the orders table
-
-            // Execute the order insert
-            stmtOrder.executeUpdate();
-
-            System.out.println("Order inserted successfully!");
-
-        } catch (SQLException e) {
-            throw new SQLException("Error inserting order: " + e.getMessage(), e);
-        }
     }
 
 }

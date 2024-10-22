@@ -5,10 +5,11 @@
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.Pane?>
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.text.Text?>
 
-<GridPane alignment="CENTER" hgap="20" prefHeight="600" prefWidth="800" style="-fx-padding: 30;" vgap="20" xmlns="http://javafx.com/javafx/22" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Controller.OrderDetailController">
+<GridPane alignment="CENTER" hgap="20" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600" prefWidth="900.0" style="-fx-padding: 30;" vgap="20" xmlns="http://javafx.com/javafx/22" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Controller.OrderDetailController">
    <columnConstraints>
       <ColumnConstraints maxWidth="300" minWidth="150" />
       <ColumnConstraints hgrow="ALWAYS" maxWidth="500" minWidth="300" />
@@ -26,7 +27,7 @@
 
       <!-- Unique Order Number -->
       <Label style="-fx-font-size: 16px;" text="Order Number:" GridPane.rowIndex="1" />
-      <TextField fx:id="orderNumberField" promptText="Unique Order Number" editable="false" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+      <TextField fx:id="orderNumberField" editable="false" promptText="Unique Order Number" GridPane.columnIndex="1" GridPane.rowIndex="1" />
 
       <!-- Total Item Summary -->
       <Label style="-fx-font-size: 16px;" text="Total Item:" GridPane.rowIndex="2" />
@@ -38,5 +39,6 @@
 
       <!-- Back to Home Button -->
       <Button fx:id="backToHomeButton" onAction="#goBackToHome" text="Back to Home" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="4" />
+      <Pane prefHeight="200.0" prefWidth="200.0" />
    </children>
 </GridPane>
