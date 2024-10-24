@@ -405,6 +405,7 @@ public class CheckOutController {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/View/homeview.fxml"));
             loader.load();
             HomeSceneController homeController = loader.getController();
+            primaryStage.setTitle(homeController.getTitle());
             homeController.selectShoppingCartTab();  // Switch to the cart tab in the home scene
         } catch (IOException ex) {
             ex.printStackTrace();

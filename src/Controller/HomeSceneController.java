@@ -74,7 +74,7 @@ public class HomeSceneController {
 	private UserDao userDao;
 	private OrderDao orderDao;
 
-    public HomeSceneController() {
+	public HomeSceneController() {
     	
     }
     
@@ -581,6 +581,7 @@ public class HomeSceneController {
         }
         
     }
+    
     public void setLoginScene(Scene loginScene) {
     }
 
@@ -738,5 +739,6 @@ public class HomeSceneController {
 	        e.printStackTrace();
 	    }
 	}
+
 
 }

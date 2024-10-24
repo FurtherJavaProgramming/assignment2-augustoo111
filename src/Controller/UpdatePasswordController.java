@@ -50,13 +50,14 @@ public class UpdatePasswordController {
     private Scene accountScene; // Reference to the account scene
     private Model model;         // The user model managing the current session
     private UserDao userDao;      // DAO to handle user data
+    private HomeSceneController homeController;
+    
     public String getTitle() {
         return "Update Password";
     }
  
- // Setter method for the Primary Stage
     public void setPrimaryStage(Stage primaryStage) {
-        primaryStage.setTitle(getTitle());
+        primaryStage.setTitle(getTitle()); // Set the title using the stage reference
     }
 
     // Setter for Model
@@ -74,7 +75,9 @@ public class UpdatePasswordController {
 
     // Setter for HomeSceneController to refresh the account tab
     public void setHomeController(HomeSceneController homeController) {
+        this.homeController = homeController;
     }
+    
     private void populateFields() {
         User currentUser = model.getCurrentUser();
 		userNameLabel.setText(currentUser.getUsername());
@@ -143,13 +146,19 @@ public class UpdatePasswordController {
     public void setAccountScene(Scene accountScene) {
         this.accountScene = accountScene;
     }
-
-    // Method to handle the 'Go Back' button
+    
+    //go back to previous scene
     @FXML
     public void goBack() {
-        Stage primaryStage = (Stage) goBackButton.getScene().getWindow();
-        primaryStage.setScene(accountScene);
+		homeController.updateAccountTab(); 
+		Stage stage = (Stage) goBackButton.getScene().getWindow();
+        stage.setScene(accountScene);  // Set the account scene back
+        stage.setTitle(homeController.getTitle());
+        stage.show();
     }
+
+
+    
 
     // Method to handle the cancel button
     @FXML

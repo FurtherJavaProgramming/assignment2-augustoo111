@@ -22,6 +22,22 @@ public class OrderDaoImplementation implements OrderDao {
 
     private final String ORDERS_TABLE = "orders";
 
+    // Step 1: Create a static instance of OrderDaoImplementation (Singleton)
+    private static OrderDaoImplementation instance;
+
+    // Step 2: Make the constructor private to prevent external instantiation
+    public OrderDaoImplementation() throws SQLException {
+        setup();  // Ensure the setup method is called when the instance is created
+    }
+
+    // Step 3: Provide a public static method to get the single instance
+    public static OrderDaoImplementation getInstance() throws SQLException {
+        if (instance == null) {
+            instance = new OrderDaoImplementation();
+        }
+        return instance;
+    }
+
     // Set up database method
     @Override
     public void setup() throws SQLException {

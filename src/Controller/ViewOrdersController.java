@@ -55,6 +55,7 @@ public class ViewOrdersController {
     private HomeSceneController homeController;
     private ObservableList<Order> ordersList = FXCollections.observableArrayList();  // List of orders to display
 	private OrderDao orderDao;
+	
     public String getTitle() {
         return "Order History";
     }
@@ -117,6 +118,7 @@ public class ViewOrdersController {
 
         Stage stage = (Stage) backButton.getScene().getWindow();
         stage.setScene(accountScene);  // Set the account scene back
+        stage.setTitle(homeController.getTitle());
         stage.show();
     }
 

@@ -8,14 +8,22 @@ import Dao.UserDao;
 import Dao.UserDaoImplementation;
 
 public class Model {
-	private UserDao userDao;
-	private User currentUser;
-	private AdminUser admin;
-	
-	public Model() {
-		userDao = new UserDaoImplementation();
-	}
-	
+    private static Model instance;
+    private UserDao userDao;
+    private User currentUser;
+    private AdminUser admin;
+
+    private Model() {
+        userDao = new UserDaoImplementation();
+    }
+
+    public static Model getInstance() {
+        if (instance == null) {
+            instance = new Model();
+        }
+        return instance;
+    }
+    
 	public void setup() throws SQLException {
 		userDao.setup();
 	}
