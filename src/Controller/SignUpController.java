@@ -34,6 +34,7 @@ public class SignUpController {
     private Model model;  // Reference to the model for interaction with DAO
 
     private Stage primaryStage;  // Main application stage
+    private LoginController loginController;
 
     // Default constructor required for FXML loading
     public SignUpController() {
@@ -53,6 +54,11 @@ public class SignUpController {
         this.primaryStage = primaryStage;
         primaryStage.setTitle(getTitle());
     }
+    //set login controller
+	public void setLoginController(LoginController loginController) {
+		this.loginController = loginController;
+		
+	}
 
     // Set the login scene to switch back after successful sign-up
     public void setLoginScene(Scene loginScene) {
@@ -130,9 +136,15 @@ public class SignUpController {
 
     // Method to handle going back to login scene
     private void goBack() {
-    	Stage primaryStage = (Stage) goBackButton.getScene().getWindow();
-        primaryStage.setScene(loginScene);
+        Stage stage = (Stage) goBackButton.getScene().getWindow();
+        stage.setScene(loginScene);  // Set the account scene back
+        
+		stage.setTitle(loginController.getTitle());
+        stage.show();
+        
+    	
     }
+    
 
     // Method to clear all input fields
     private void clearFields() {
@@ -151,4 +163,6 @@ public class SignUpController {
         alert.setContentText(content);
         alert.showAndWait();
     }
+
+
 }

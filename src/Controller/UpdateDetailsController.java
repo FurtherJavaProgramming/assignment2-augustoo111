@@ -118,6 +118,7 @@ public class UpdateDetailsController {
         homeController.updateAccountTab(); 
         Stage stage = (Stage) backButton.getScene().getWindow();
         stage.setScene(accountScene);  // Set the account scene back
+        stage.setTitle(homeController.getTitle());
         stage.show();
     }
 

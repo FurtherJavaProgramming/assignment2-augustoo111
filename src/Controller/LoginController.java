@@ -202,7 +202,7 @@ public class LoginController {
             signUpController.setModel(model);
             signUpController.setPrimaryStage(primaryStage); 
             signUpController.setLoginScene(primaryStage.getScene());
-
+            signUpController.setLoginController(this); 
             Scene signUpScene = new Scene(root);
             primaryStage.setScene(signUpScene);  // Switch to sign-up scene
             primaryStage.show();
