@@ -3,66 +3,63 @@
 **Author:** Augustina Oo  
 **Course:** Programming – Assignment 2  
 **University:** RMIT University  
-**Year:** 2025  
+**Year:** 2024  
 
 ---
 
 ## 🧾 Project Overview
 
-**TheReadingRoom** is a JavaFX-based GUI application developed as part of a programming assignment at RMIT University. This application simulates a digital bookstore where users can browse and purchase books from *The Reading Room*.
-
-Building on concepts from Assignment 1, this project applies **object-oriented programming**, **design patterns**, and the **Java Collections Framework** to deliver a responsive, interactive book purchasing experience.
+**TheReadingRoom** is a desktop GUI application developed in Java using JavaFX. It simulates a bookstore system for *The Reading Room*, allowing users to register, browse books, manage a cart, and place orders. This project is part of a university assignment focused on applying object-oriented design principles, JavaFX, DAO patterns, and the Java Collections Framework.
 
 ---
 
-## 🎯 Features
+## 🎯 Key Features
 
-- 👤 **User Registration & Login**  
-  Secure login system with personalized dashboard
-
-- 📚 **Book Browsing**  
-  Browse available titles and view details
-
-- 🛒 **Cart Management**  
-  Add and remove books via GUI; manage total price
-
-- 💳 **Checkout System**  
-  Simulated checkout process
-
-- 🧾 **Order History**  
-  Displays all past orders for the logged-in user
-
-- ⚙️ **Profile Management**  
-  Allows user to update their personal information
+- 👤 **User Registration & Login**
+- 🧾 **User Dashboard** with order history
+- 📚 **Book Browsing & Search**
+- 🛒 **Shopping Cart Management**
+- 💳 **Checkout Functionality**
+- 📝 **Profile Update & Password Reset**
+- 🧑‍💼 **Admin Dashboard** for order and user management
 
 ---
 
-## 💻 Technologies Used
+## 🛠️ Technologies Used
 
-- **Java** (JDK 17+)  
-- **JavaFX** for GUI development  
-- **Object-Oriented Design**  
-- **Java Collections Framework** (ArrayList, HashMap, etc.)
+- **Java** (JDK 17+)
+- **JavaFX** for GUI development
+- **Java Collections Framework**
+- **FXML** for layout
+- **DAO Pattern** for data abstraction
+- **Singleton Design Pattern**
 
 ---
 
 ## 📁 Project Structure
 
-src/
+TheReadingRoom/
 │
-├── controllers/
-│ └── MainController.java
-│ └── LoginController.java
-│ └── DashboardController.java
-│
-├── models/
-│ └── Book.java
-│ └── User.java
-│ └── Order.java
-│
-├── views/
-│ └── login.fxml
-│ └── dashboard.fxml
-│ └── cart.fxml
-│
-├── Main.java
+├── Controller/ # JavaFX Controllers (e.g., LoginController, SignUpController)
+├── Dao/ # DAO interfaces and implementations (e.g., BookDao, UserDao)
+├── Model/ # Core models (e.g., User, Book, Order, ShoppingCart)
+├── View/ # JavaFX scenes and FXML files
+├── main/resources/exports/ # Exported data (e.g., order history spreadsheets)
+├── readingroom_2/ # Main class and app entry point (Main.java)
+
+---
+
+## 🚀 How to Run
+
+### Prerequisites
+
+- Java JDK 17 or above
+- JavaFX SDK
+- IDE such as IntelliJ IDEA or Eclipse (JavaFX support enabled)
+
+### Steps
+
+1. Clone the repository:
+   ```bash
+   git clone https:
+   cd TheReadingRoom
