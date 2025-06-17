@@ -61,5 +61,5 @@ TheReadingRoom/
 
 1. Clone the repository:
    ```bash
-   git clone https:
+   git clone (https://github.com/FurtherJavaProgramming/assignment2-augustoo111)
    cd TheReadingRoom
